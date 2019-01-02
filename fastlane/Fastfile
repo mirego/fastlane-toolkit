@@ -52,17 +52,17 @@ module Models
   end
 end
 
-#-------------------------
-# Helpers
-#-------------------------
-
-class String
-  def strip_quotes
-    gsub(/\A['"]+|['"]+\Z/, "")
-  end
-end
-
 platform :ios do
+  #-------------------------
+  # Helpers
+  #-------------------------
+
+  class String
+    def strip_quotes
+      gsub(/\A['"]+|['"]+\Z/, "")
+    end
+  end
+  
   #-------------------------
   # Configuration
   #-------------------------
