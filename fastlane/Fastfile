@@ -1,0 +1,101 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+
+require_relative 'models/project'
+require_relative 'models/configuration'
+require_relative 'models/certificate'
+require_relative 'models/provisioning_profile'
+require_relative 'helpers/string'
+
+platform :ios do
+
+  #-------------------------
+  # Configuration
+  #-------------------------
+
+  betaProvisioningProfile = Models::ProvisioningProfile.new(
+    path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_FILE"].strip_quotes}"
+  )
+
+  betaCertificate = Models::Certificate.new(
+    path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_CERTIFICATE_FILE"].strip_quotes}",
+    name: ENV["PROVISIONING_NAME"].strip_quotes,
+    password: ENV["PROVISIONING_CERTIFICATE_PASSWORD"].strip_quotes
+  )
+
+  betaConfiguration = Models::Configuration.new(
+    certificate: betaCertificate,
+    provisioningProfile: betaProvisioningProfile,
+    buildConfiguration: "AdHoc",
+    exportMethod: "enterprise"
+  )
+
+  #-------------------------
+  # Private lanes
+  #-------------------------
+
+  desc "Build an iOS archive given a project and configuration"
+  private_lane :build do |options|
+    project = options[:project]
+    configuration = options[:configuration]
+    bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
+
+    keychain_name = ENV["keychain"].strip_quotes
+    keychain_password = ENV["keychain_password"].strip_quotes
+    keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
+
+    cocoapods(
+      clean: true,
+      use_bundle_exec: true,
+      try_repo_update_on_error: true
+    )
+    disable_automatic_code_signing(path: project.projectPath)
+    install_provisioning_profile(path: configuration.provisioningProfile.path)
+    update_project_team(
+      path: project.projectPath,
+      teamid: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID]
+    )
+    update_app_identifier(
+      xcodeproj: project.projectPath,
+      plist_path: project.infoPlistPath,
+      app_identifier: bundleIdentifier
+    )
+    import_certificate(
+      certificate_path: configuration.certificate.path,
+      certificate_password: configuration.certificate.password,
+      keychain_name: keychain_name,
+      keychain_path: keychain_path,
+      keychain_password: keychain_password
+    )
+    update_project_provisioning(
+      xcodeproj: project.projectPath,
+      profile: configuration.provisioningProfile.path,
+      target_filter: project.target,
+      build_configuration: configuration.buildConfiguration
+    )
+    build_ios_app(
+      workspace: project.workspacePath,
+      scheme: project.scheme,
+      clean: true,
+      configuration: configuration.buildConfiguration,
+      silent: true,
+      include_symbols: true,
+      include_bitcode: true,
+      skip_profile_detection: true,
+      codesigning_identity: configuration.certificate.name,
+      export_team_id: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID],
+      export_method: configuration.exportMethod,
+      export_xcargs: "-allowProvisioningUpdates",
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: {
+          bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME]
+        }
+      })
+  end
+end
