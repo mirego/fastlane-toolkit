@@ -16,7 +16,7 @@ Important to note that this Fastfile is just a starting point, if you need more 
 Start by defining your project by creating a `Project` instance describing what's contained in your repository.
 
 ```ruby
-sampleProject = Models::Project.new(
+sampleProject = Model::Project.new(
   workspacePath: "Sample.xcworkspace",
   projectPath: "Sample.xcodeproj",
   infoPlistPath: "Sample/Info.plist",
@@ -46,17 +46,17 @@ end
 If you need to sign your build using a custom signing certificate, create your custom configuration object and call the `build` lane with it.
 
 ```ruby
-appStoreProvisioningProfile = Models::ProvisioningProfile.new(
+appStoreProvisioningProfile = Model::ProvisioningProfile.new(
   path: "./fastlane/provisioning/AppStore.mobileprovision"
 )
 
-appStoreCertificate = Models::Certificate.new(
+appStoreCertificate = Model::Certificate.new(
   path: "./fastlane/provisioning/AppStore.p12",
   name: "iPhone Distribution: Sample (????????)",
   password: "SuperStrongPassword"
 )
 
-appStoreConfiguration = Models::Configuration.new(
+appStoreConfiguration = Model::Configuration.new(
   certificate: appStoreCertificate,
   provisioningProfile: appStoreProvisioningProfile,
   buildConfiguration: "Release",

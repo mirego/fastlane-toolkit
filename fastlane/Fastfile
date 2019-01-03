@@ -7,10 +7,10 @@
 #
 
 #-------------------------
-# Models
+# Model classes
 #-------------------------
 
-module Models
+module Model
   class Project
     attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier
     def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:)
@@ -63,21 +63,22 @@ class String
 end
 
 platform :ios do
+
   #-------------------------
   # Configuration
   #-------------------------
 
-  betaProvisioningProfile = Models::ProvisioningProfile.new(
+  betaProvisioningProfile = Model::ProvisioningProfile.new(
     path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_FILE"].strip_quotes}"
   )
 
-  betaCertificate = Models::Certificate.new(
+  betaCertificate = Model::Certificate.new(
     path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_CERTIFICATE_FILE"].strip_quotes}",
     name: ENV["PROVISIONING_NAME"].strip_quotes,
     password: ENV["PROVISIONING_CERTIFICATE_PASSWORD"].strip_quotes
   )
 
-  betaConfiguration = Models::Configuration.new(
+  betaConfiguration = Model::Configuration.new(
     certificate: betaCertificate,
     provisioningProfile: betaProvisioningProfile,
     buildConfiguration: "Release",
