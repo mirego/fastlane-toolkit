@@ -62,12 +62,6 @@ class String
   end
 end
 
-class NilClass
-  def strip_quotes
-    nil
-  end
-end
-
 platform :ios do
   #-------------------------
   # Configuration
