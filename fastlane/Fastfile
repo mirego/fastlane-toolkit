@@ -110,7 +110,7 @@ platform :ios do
     update_project_provisioning(
       xcodeproj: project.projectPath,
       profile: configuration.provisioningProfile.path,
-      target_filter: project.target,
+      #target_filter: project.target,
       build_configuration: configuration.buildConfiguration
     )
     build_ios_app(
