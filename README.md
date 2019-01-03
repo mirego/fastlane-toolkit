@@ -90,5 +90,25 @@ Internally required by the `build` private lane, the `install_provisioning_profi
 ### icon_banner
 WIP - Do not work at the moment
 
+## Jenkins Configuration
+### Required options
+- Prepare an environment for the run
+  - Keep Jenkins Environment Variables
+  - Keep Jenkins Build Variables
+  - Properties File Path: `${HOME}/.build_ios_env`
+
+- Build
+  - Execute shell
+    ```
+    bundle install
+    bundle exec fastlane beta
+    ```
+
+### Recommended options
+- Color ANSI Console Output: `xterm`
+
+### Jenkins DSL Example
+_TODO_
+
 ## Contributing
 If you find that something else could be useful or if your use case is not covered and you feel that it could benefit others, please take the time to contribute by opening a pull request or open an issue asking for it very very kindly ;)
