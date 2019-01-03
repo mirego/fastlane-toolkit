@@ -89,11 +89,6 @@ platform :ios do
     keychain_password = ENV["keychain_password"].gsub(/\A['"]+|['"]+\Z/, "")
     keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
 
-    cocoapods(
-      clean: true,
-      use_bundle_exec: true,
-      try_repo_update_on_error: true
-    )
     disable_automatic_code_signing(path: project.projectPath)
     install_provisioning_profile(path: configuration.provisioningProfile.path)
     update_project_team(
