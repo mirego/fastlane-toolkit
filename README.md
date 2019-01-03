@@ -85,3 +85,6 @@ Internally required by the `build` private lane, the `install_provisioning_profi
 
 ### icon_banner
 WIP - Do not work at the moment
+
+## Contributing
+If you find that something else could be useful or if your use case is not covered and you feel that it could benefit others, please take the time to contribute by opening a pull request or open an issue asking for it very very kindly ;)
