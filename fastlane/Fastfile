@@ -71,7 +71,7 @@ platform :ios do
   )
 
   betaCertificate = Model::Certificate.new(
-    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"]}",
+    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
     name: strip_quotes(ENV["PROVISIONING_NAME"]),
     password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
   )
