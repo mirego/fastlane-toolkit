@@ -116,7 +116,7 @@ platform :ios do
     build_ios_app(
       workspace: project.workspacePath,
       scheme: project.scheme,
-      clean: true,
+      #clean: true,
       configuration: configuration.buildConfiguration,
       silent: true,
       include_symbols: true,
