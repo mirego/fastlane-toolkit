@@ -80,7 +80,7 @@ platform :ios do
   #-------------------------
 
   desc "Build an iOS archive given a project and configuration"
-  lane :build do |options|
+  private_lane :build do |options|
     project = options[:project]
     configuration = options[:configuration].nil? ? betaConfiguration : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
