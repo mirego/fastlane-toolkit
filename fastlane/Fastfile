@@ -82,7 +82,7 @@ platform :ios do
   desc "Build an iOS archive given a project and configuration"
   private_lane :build do |options|
     project = options[:project]
-    configuration = options[:configuration]
+    configuration = options[:configuration].nil? ? betaConfiguration : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
 
     keychain_name = ENV["keychain"].gsub(/\A['"]+|['"]+\Z/, "")
