@@ -58,10 +58,8 @@ platform :ios do
   # Helpers
   #-------------------------
 
-  class String
-    def strip_quotes
-      gsub(/\A['"]+|['"]+\Z/, "")
-    end
+  def strip_quotes(input)
+    input.gsub(/\A['"]+|['"]+\Z/, "")
   end
 
   #-------------------------
@@ -69,13 +67,13 @@ platform :ios do
   #-------------------------
 
   betaProvisioningProfile = Model::ProvisioningProfile.new(
-    path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_FILE"].strip_quotes}"
+    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
   )
 
   betaCertificate = Model::Certificate.new(
-    path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_CERTIFICATE_FILE"].strip_quotes}",
-    name: ENV["PROVISIONING_NAME"].strip_quotes,
-    password: ENV["PROVISIONING_CERTIFICATE_PASSWORD"].strip_quotes
+    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"]}",
+    name: strip_quotes(ENV["PROVISIONING_NAME"]),
+    password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
   )
 
   betaConfiguration = Model::Configuration.new(
@@ -95,8 +93,8 @@ platform :ios do
     configuration = options[:configuration].nil? ? betaConfiguration : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
 
-    keychain_name = ENV["keychain"].strip_quotes
-    keychain_password = ENV["keychain_password"].strip_quotes
+    keychain_name = strip_quotes(ENV["keychain"])
+    keychain_password = strip_quotes(ENV["keychain_password"])
     keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
 
     disable_automatic_code_signing(path: project.projectPath)
