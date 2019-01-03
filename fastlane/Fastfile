@@ -25,7 +25,7 @@ module Models
 
   class Configuration
     attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride
-    attr_writer :bundleIdentifierOverride
+    attr_writer :buildConfiguration, :bundleIdentifierOverride
     def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil)
       @certificate = certificate
       @provisioningProfile = provisioningProfile
@@ -80,7 +80,7 @@ platform :ios do
   betaConfiguration = Models::Configuration.new(
     certificate: betaCertificate,
     provisioningProfile: betaProvisioningProfile,
-    buildConfiguration: "AdHoc",
+    buildConfiguration: "Release",
     exportMethod: "enterprise"
   )
 
