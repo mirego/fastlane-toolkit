@@ -13,10 +13,12 @@ A build is produced by providing a `Project` object with a `Configuration` objec
 Important to note that this Fastfile is just a starting point, if you need more flexibility or more advanced features I encourage you to use fastlane as it pleases you.
 
 ## Usage
-Start by importing the boilerplate and defining your project by creating a `Project` instance describing what's contained in your repository.
+Start by importing the boilerplate at the very top of your Fastfile and defining your project by creating a `Project` instance describing what's contained in your repository.
 
 ```ruby
 import_from_git(url: "git@github.com:mirego/fastlane-boilerplate.git")
+
+# ...
 
 sampleProject = Model::Project.new(
   workspacePath: "Sample.xcworkspace",
@@ -33,6 +35,7 @@ Once it's done, create a lane that import the boilerplate and that calls the pro
 ```ruby
 desc "Build using the enterprise certificate and publish on HockeyApp"
 lane :beta do
+  cocoapods(use_bundle_exec: true, try_repo_update_on_error: true)
   build(project: sampleProject, configuration: betaConfiguration)
   changelog_from_git_commits(commits_count: 10)
   hockey(
