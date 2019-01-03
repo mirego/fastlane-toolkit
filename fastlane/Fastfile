@@ -55,27 +55,17 @@ end
 platform :ios do
 
   #-------------------------
-  # Helpers
-  #-------------------------
-
-  class String
-    def strip_quotes
-      gsub(/\A['"]+|['"]+\Z/, "")
-    end
-  end
-
-  #-------------------------
   # Configuration
   #-------------------------
 
   betaProvisioningProfile = Model::ProvisioningProfile.new(
-    path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_FILE"].strip_quotes}"
+    path: "#{ENV["PROVISIONING_DIR"].gsub(/\A['"]+|['"]+\Z/, "")}/#{ENV["PROVISIONING_FILE"].gsub(/\A['"]+|['"]+\Z/, "")}"
   )
 
   betaCertificate = Model::Certificate.new(
-    path: "#{ENV["PROVISIONING_DIR"].strip_quotes}/#{ENV["PROVISIONING_CERTIFICATE_FILE"].strip_quotes}",
-    name: ENV["PROVISIONING_NAME"].strip_quotes,
-    password: ENV["PROVISIONING_CERTIFICATE_PASSWORD"].strip_quotes
+    path: "#{ENV["PROVISIONING_DIR"].gsub(/\A['"]+|['"]+\Z/, "")}/#{ENV["PROVISIONING_CERTIFICATE_FILE"].gsub(/\A['"]+|['"]+\Z/, "")}",
+    name: ENV["PROVISIONING_NAME"].gsub(/\A['"]+|['"]+\Z/, ""),
+    password: ENV["PROVISIONING_CERTIFICATE_PASSWORD"].gsub(/\A['"]+|['"]+\Z/, "")
   )
 
   betaConfiguration = Model::Configuration.new(
@@ -95,8 +85,8 @@ platform :ios do
     configuration = options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
 
-    keychain_name = ENV["keychain"].strip_quotes
-    keychain_password = ENV["keychain_password"].strip_quotes
+    keychain_name = ENV["keychain"].gsub(/\A['"]+|['"]+\Z/, "")
+    keychain_password = ENV["keychain_password"].gsub(/\A['"]+|['"]+\Z/, "")
     keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
 
     cocoapods(
