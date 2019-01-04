@@ -1,0 +1,143 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+
+#-------------------------
+# Model classes
+#-------------------------
+
+module Model
+  class Project
+    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier
+    def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:)
+      @workspacePath = workspacePath
+      @projectPath = projectPath
+      @infoPlistPath = infoPlistPath
+      @scheme = scheme
+      @target = target
+      @bundleIdentifier = bundleIdentifier
+    end
+  end
+
+  class Configuration
+    attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride
+    attr_writer :buildConfiguration, :bundleIdentifierOverride
+    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil)
+      @certificate = certificate
+      @provisioningProfile = provisioningProfile
+      @buildConfiguration = buildConfiguration
+      @exportMethod = exportMethod
+      @bundleIdentifierOverride = bundleIdentifierOverride
+    end
+  end
+
+  class Certificate
+    attr_reader :path, :name, :password
+    def initialize(path:, name:, password:)
+      @path = path
+      @name = name
+      @password = password
+    end
+  end
+
+  class ProvisioningProfile
+    attr_reader :path
+    def initialize(path:)
+      @path = path
+    end
+  end
+end
+
+platform :ios do
+
+  #-------------------------
+  # Helpers
+  #-------------------------
+
+  def strip_quotes(input)
+    input.gsub(/\A['"]+|['"]+\Z/, "")
+  end
+
+  #-------------------------
+  # Configuration
+  #-------------------------
+
+  betaProvisioningProfile = Model::ProvisioningProfile.new(
+    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
+  )
+
+  betaCertificate = Model::Certificate.new(
+    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
+    name: strip_quotes(ENV["PROVISIONING_NAME"]),
+    password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
+  )
+
+  betaConfiguration = Model::Configuration.new(
+    certificate: betaCertificate,
+    provisioningProfile: betaProvisioningProfile,
+    buildConfiguration: "Release",
+    exportMethod: "enterprise"
+  )
+
+  #-------------------------
+  # Private lanes
+  #-------------------------
+
+  desc "Build an iOS archive given a project and configuration"
+  private_lane :build do |options|
+    project = options[:project]
+    configuration = options[:configuration].nil? ? betaConfiguration : options[:configuration]
+    bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
+
+    keychain_name = strip_quotes(ENV["keychain"])
+    keychain_password = strip_quotes(ENV["keychain_password"])
+    keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
+
+    disable_automatic_code_signing(path: project.projectPath)
+    install_provisioning_profile(path: configuration.provisioningProfile.path)
+    update_project_team(
+      path: project.projectPath,
+      teamid: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID]
+    )
+    update_app_identifier(
+      xcodeproj: project.projectPath,
+      plist_path: project.infoPlistPath,
+      app_identifier: bundleIdentifier
+    )
+    import_certificate(
+      certificate_path: configuration.certificate.path,
+      certificate_password: configuration.certificate.password,
+      keychain_name: keychain_name,
+      keychain_path: keychain_path,
+      keychain_password: keychain_password
+    )
+    update_project_provisioning(
+      xcodeproj: project.projectPath,
+      profile: configuration.provisioningProfile.path,
+      build_configuration: configuration.buildConfiguration
+    )
+    build_ios_app(
+      workspace: project.workspacePath,
+      scheme: project.scheme,
+      clean: true,
+      configuration: configuration.buildConfiguration,
+      silent: true,
+      include_symbols: true,
+      include_bitcode: true,
+      skip_profile_detection: true,
+      codesigning_identity: configuration.certificate.name,
+      export_team_id: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID],
+      export_method: configuration.exportMethod,
+      export_xcargs: "-allowProvisioningUpdates",
+      export_options: {
+        signingStyle: "manual",
+        provisioningProfiles: {
+          bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME]
+        }
+      })
+  end
+end
