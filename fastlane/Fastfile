@@ -120,6 +120,7 @@ platform :ios do
       profile: configuration.provisioningProfile.path,
       build_configuration: configuration.buildConfiguration
     )
+    unlock_keychain(path: keychain_path, password: keychain_password)
     build_ios_app(
       workspace: project.workspacePath,
       scheme: project.scheme,
