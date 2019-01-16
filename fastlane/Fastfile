@@ -52,6 +52,14 @@ module Model
   end
 end
 
+module Fastlane
+  module Actions
+    module SharedValues
+      ENTERPRISE_CONFIGURATION = :ENTERPRISE_CONFIGURATION
+    end
+  end
+end
+
 platform :ios do
 
   #-------------------------
@@ -67,22 +75,24 @@ platform :ios do
   #-------------------------
 
   if ENV["EXEC_RUNNING_ON_JENKINS"] == "YES"
-    $genericProvisioningProfile = Model::ProvisioningProfile.new(
+    genericProvisioningProfile = Model::ProvisioningProfile.new(
       path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
     )
 
-    $enterpriseCertificate = Model::Certificate.new(
+    enterpriseCertificate = Model::Certificate.new(
       path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
       name: strip_quotes(ENV["PROVISIONING_NAME"]),
       password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
     )
 
-    $enterpriseConfiguration = Model::Configuration.new(
-      certificate: $enterpriseCertificate,
-      provisioningProfile: $genericProvisioningProfile,
+    enterpriseConfiguration = Model::Configuration.new(
+      certificate: enterpriseCertificate,
+      provisioningProfile: genericProvisioningProfile,
       buildConfiguration: "Release",
       exportMethod: "enterprise"
     )
+
+    lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
   end
 
   #-------------------------
@@ -92,7 +102,7 @@ platform :ios do
   desc "Build an iOS archive given a project and configuration"
   private_lane :build do |options|
     project = options[:project]
-    configuration = options[:configuration].nil? ? $enterpriseConfiguration : options[:configuration]
+    configuration = options[:configuration].nil? ? enterpriseConfiguration : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
 
     keychain_name = strip_quotes(ENV["keychain"])
