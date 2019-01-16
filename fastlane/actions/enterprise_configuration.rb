@@ -89,10 +89,6 @@ module Fastlane
       "Dummy action to provide enterprise configuration shared value"
     end
 
-    def self.available_options
-      []
-    end
-
     def self.output
       [
         ['ENTERPRISE_CONFIGURATION', 'Enterprise configuration']
