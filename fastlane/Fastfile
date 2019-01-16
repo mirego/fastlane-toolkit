@@ -52,6 +52,10 @@ module Model
   end
 end
 
+#-------------------------
+# Shared values
+#-------------------------
+
 module Fastlane
   module Actions
     module SharedValues
@@ -92,7 +96,7 @@ platform :ios do
       exportMethod: "enterprise"
     )
 
-    lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
+    Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
   end
 
   #-------------------------
