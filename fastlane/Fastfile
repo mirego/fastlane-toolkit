@@ -52,17 +52,6 @@ module Model
   end
 end
 
-#-------------------------
-# Shared values
-#-------------------------
-
-module Fastlane
-  module Actions
-    module SharedValues
-      ENTERPRISE_CONFIGURATION = :ENTERPRISE_CONFIGURATION
-    end
-  end
-end
 
 platform :ios do
 
