@@ -66,22 +66,24 @@ platform :ios do
   # Configuration
   #-------------------------
 
-  betaProvisioningProfile = Model::ProvisioningProfile.new(
-    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
-  )
+  if ENV["EXEC_RUNNING_ON_JENKINS"] == "YES"
+    $betaProvisioningProfile = Model::ProvisioningProfile.new(
+      path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
+    )
 
-  betaCertificate = Model::Certificate.new(
-    path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
-    name: strip_quotes(ENV["PROVISIONING_NAME"]),
-    password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
-  )
+    $betaCertificate = Model::Certificate.new(
+      path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
+      name: strip_quotes(ENV["PROVISIONING_NAME"]),
+      password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
+    )
 
-  betaConfiguration = Model::Configuration.new(
-    certificate: betaCertificate,
-    provisioningProfile: betaProvisioningProfile,
-    buildConfiguration: "Release",
-    exportMethod: "enterprise"
-  )
+    $betaConfiguration = Model::Configuration.new(
+      certificate: $betaCertificate,
+      provisioningProfile: $betaProvisioningProfile,
+      buildConfiguration: "Release",
+      exportMethod: "enterprise"
+    )
+  end
 
   #-------------------------
   # Private lanes
@@ -90,7 +92,7 @@ platform :ios do
   desc "Build an iOS archive given a project and configuration"
   private_lane :build do |options|
     project = options[:project]
-    configuration = options[:configuration].nil? ? betaConfiguration : options[:configuration]
+    configuration = options[:configuration].nil? ? $betaConfiguration : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
 
     keychain_name = strip_quotes(ENV["keychain"])
