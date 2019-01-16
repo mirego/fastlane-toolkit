@@ -44,6 +44,10 @@ module Model
   end
 end
 
+def strip_quotes(input)
+  input.gsub(/\A['"]+|['"]+\Z/, "")
+end
+
 module Fastlane
   module Actions
     module SharedValues
@@ -52,31 +56,29 @@ module Fastlane
   end
 
   class EnterpriseConfiguration < Action
-    def strip_quotes(input)
-      input.gsub(/\A['"]+|['"]+\Z/, "")
-    end
 
     def self.run(params)
-      if ENV["EXEC_RUNNING_ON_JENKINS"] == "YES"
-        genericProvisioningProfile = Model::ProvisioningProfile.new(
-          path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
-        )
-
-        enterpriseCertificate = Model::Certificate.new(
-          path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
-          name: strip_quotes(ENV["PROVISIONING_NAME"]),
-          password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
-        )
-
-        enterpriseConfiguration = Model::Configuration.new(
-          certificate: enterpriseCertificate,
-          provisioningProfile: genericProvisioningProfile,
-          buildConfiguration: "Release",
-          exportMethod: "enterprise"
-        )
-
-        Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
-      end
+      Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = "Test"
+      # if ENV["EXEC_RUNNING_ON_JENKINS"] == "YES"
+      #   genericProvisioningProfile = Model::ProvisioningProfile.new(
+      #     path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
+      #   )
+      #
+      #   enterpriseCertificate = Model::Certificate.new(
+      #     path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
+      #     name: strip_quotes(ENV["PROVISIONING_NAME"]),
+      #     password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
+      #   )
+      #
+      #   enterpriseConfiguration = Model::Configuration.new(
+      #     certificate: enterpriseCertificate,
+      #     provisioningProfile: genericProvisioningProfile,
+      #     buildConfiguration: "Release",
+      #     exportMethod: "enterprise"
+      #   )
+      #
+      #   Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
+      # end
     end
 
     #####################################################
