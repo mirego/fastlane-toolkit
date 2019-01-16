@@ -2,51 +2,51 @@
 # Model classes
 #-------------------------
 
-module Model
-  class Project
-    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier
-    def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:)
-      @workspacePath = workspacePath
-      @projectPath = projectPath
-      @infoPlistPath = infoPlistPath
-      @scheme = scheme
-      @target = target
-      @bundleIdentifier = bundleIdentifier
-    end
-  end
-
-  class Configuration
-    attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride
-    attr_writer :buildConfiguration, :bundleIdentifierOverride
-    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil)
-      @certificate = certificate
-      @provisioningProfile = provisioningProfile
-      @buildConfiguration = buildConfiguration
-      @exportMethod = exportMethod
-      @bundleIdentifierOverride = bundleIdentifierOverride
-    end
-  end
-
-  class Certificate
-    attr_reader :path, :name, :password
-    def initialize(path:, name:, password:)
-      @path = path
-      @name = name
-      @password = password
-    end
-  end
-
-  class ProvisioningProfile
-    attr_reader :path
-    def initialize(path:)
-      @path = path
-    end
-  end
-end
-
-def strip_quotes(input)
-  input.gsub(/\A['"]+|['"]+\Z/, "")
-end
+# module Model
+#   class Project
+#     attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier
+#     def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:)
+#       @workspacePath = workspacePath
+#       @projectPath = projectPath
+#       @infoPlistPath = infoPlistPath
+#       @scheme = scheme
+#       @target = target
+#       @bundleIdentifier = bundleIdentifier
+#     end
+#   end
+#
+#   class Configuration
+#     attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride
+#     attr_writer :buildConfiguration, :bundleIdentifierOverride
+#     def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil)
+#       @certificate = certificate
+#       @provisioningProfile = provisioningProfile
+#       @buildConfiguration = buildConfiguration
+#       @exportMethod = exportMethod
+#       @bundleIdentifierOverride = bundleIdentifierOverride
+#     end
+#   end
+#
+#   class Certificate
+#     attr_reader :path, :name, :password
+#     def initialize(path:, name:, password:)
+#       @path = path
+#       @name = name
+#       @password = password
+#     end
+#   end
+#
+#   class ProvisioningProfile
+#     attr_reader :path
+#     def initialize(path:)
+#       @path = path
+#     end
+#   end
+# end
+#
+# def strip_quotes(input)
+#   input.gsub(/\A['"]+|['"]+\Z/, "")
+# end
 
 module Fastlane
   module Actions
