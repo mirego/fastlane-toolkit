@@ -56,8 +56,6 @@ module Fastlane
 
     class EnterpriseConfigurationAction < Action
       def self.run(params)
-        # sh "shellcommand ./path"
-
         if ENV["EXEC_RUNNING_ON_JENKINS"] == "YES"
           genericProvisioningProfile = Model::ProvisioningProfile.new(
             path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
@@ -93,7 +91,7 @@ module Fastlane
       #####################################################
 
       def self.description
-        "A short description with <= 80 characters of what this action does"
+        "Return the enterprise configuration if running on Jenkins"
       end
 
       def self.details
@@ -103,32 +101,20 @@ module Fastlane
       end
 
       def self.available_options
-        # Define all options your action supports.
-
-        # Below a few examples
-        [
-          FastlaneCore::ConfigItem.new(key: :development,
-                                       env_name: "FL_ENTERPRISE_CONFIGURATION_DEVELOPMENT",
-                                       description: "Create a development certificate instead of a distribution one",
-                                       is_string: false, # true: verifies the input is a string, false: every kind of value
-                                       default_value: false) # the default value if the user didn't provide one
-        ]
+        # None
       end
 
       def self.output
-        # Define the shared values you are going to provide
-        # Example
         [
           ['ENTERPRISE_CONFIGURATION', 'A configuration containing a generic provisioning profile and enterprise certificate']
         ]
       end
 
       def self.return_value
-        # If your method provides a return value, you can describe here what it does
+        "The enterprise configuration"
       end
 
       def self.authors
-        # So no one will ever forget your contribution to fastlane :) You are awesome btw!
         ["antoinelamy"]
       end
 
