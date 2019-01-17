@@ -56,12 +56,28 @@ module Fastlane
 
     class EnterpriseConfigurationAction < Action
       def self.run(params)
-        # fastlane will take care of reading in the parameter and fetching the environment variable:
-        UI.message "Parameter API Token: #{params[:api_token]}"
-
         # sh "shellcommand ./path"
+        
+        if ENV["EXEC_RUNNING_ON_JENKINS"] == "YES"
+          genericProvisioningProfile = Model::ProvisioningProfile.new(
+            path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
+          )
 
-        Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = "my_val"
+          enterpriseCertificate = Model::Certificate.new(
+            path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_CERTIFICATE_FILE"])}",
+            name: strip_quotes(ENV["PROVISIONING_NAME"]),
+            password: strip_quotes(ENV["PROVISIONING_CERTIFICATE_PASSWORD"])
+          )
+
+          enterpriseConfiguration = Model::Configuration.new(
+            certificate: enterpriseCertificate,
+            provisioningProfile: genericProvisioningProfile,
+            buildConfiguration: "Release",
+            exportMethod: "enterprise"
+          )
+
+          Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
+        end
       end
 
       #####################################################
@@ -83,13 +99,6 @@ module Fastlane
 
         # Below a few examples
         [
-          FastlaneCore::ConfigItem.new(key: :api_token,
-                                       env_name: "FL_ENTERPRISE_CONFIGURATION_API_TOKEN", # The name of the environment variable
-                                       description: "API Token for EnterpriseConfigurationAction", # a short description of this parameter
-                                       verify_block: proc do |value|
-                                          UI.user_error!("No API token for EnterpriseConfigurationAction given, pass using `api_token: 'token'`") unless (value and not value.empty?)
-                                          # UI.user_error!("Couldn't find file at path '#{value}'") unless File.exist?(value)
-                                       end),
           FastlaneCore::ConfigItem.new(key: :development,
                                        env_name: "FL_ENTERPRISE_CONFIGURATION_DEVELOPMENT",
                                        description: "Create a development certificate instead of a distribution one",
