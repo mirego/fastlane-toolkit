@@ -57,7 +57,7 @@ module Fastlane
     class EnterpriseConfigurationAction < Action
       def self.run(params)
         # sh "shellcommand ./path"
-        
+
         if ENV["EXEC_RUNNING_ON_JENKINS"] == "YES"
           genericProvisioningProfile = Model::ProvisioningProfile.new(
             path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
@@ -76,6 +76,14 @@ module Fastlane
             exportMethod: "enterprise"
           )
 
+          Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
+        else
+          enterpriseConfiguration = Model::Configuration.new(
+            certificate: nil,
+            provisioningProfile: nil,
+            buildConfiguration: "Release",
+            exportMethod: "enterprise"
+          )
           Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
         end
       end
