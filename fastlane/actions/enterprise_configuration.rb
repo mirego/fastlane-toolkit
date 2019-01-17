@@ -90,12 +90,6 @@ module Fastlane
         "Return the enterprise configuration if running on Jenkins"
       end
 
-      def self.details
-        # Optional:
-        # this is your chance to provide a more detailed description of this action
-        "You can use this action to do cool things..."
-      end
-
       def self.available_options
         # None
       end
