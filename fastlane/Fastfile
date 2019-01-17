@@ -8,13 +8,13 @@
 
 platform :ios do
 
-  #-------------------------
-  # Helpers
-  #-------------------------
-
-  def strip_quotes(input)
-    input.gsub(/\A['"]+|['"]+\Z/, "")
-  end
+  # #-------------------------
+  # # Helpers
+  # #-------------------------
+  # 
+  # def strip_quotes(input)
+  #   input.gsub(/\A['"]+|['"]+\Z/, "")
+  # end
 
   #-------------------------
   # Private lanes

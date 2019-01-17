@@ -48,6 +48,10 @@ def strip_quotes(input)
   input.gsub(/\A['"]+|['"]+\Z/, "")
 end
 
+#-------------------------
+# Action definition
+#-------------------------
+
 module Fastlane
   module Actions
     module SharedValues
