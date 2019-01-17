@@ -30,13 +30,13 @@ sampleProject = Model::Project.new(
 )
 ```
 
-Once it's done, create a lane that import the boilerplate and that calls the provided `build` lane with your project and the provided `betaConfiguration`.
+Once it's done, create a lane that import the boilerplate and that calls the provided `build` lane with your project. You can either explicitly specify the enterprise configuration by calling `build(project: sampleProject, configuration: enterprise_configuration())` or simply omit the configuration parameter as it is the default value when none is supplied.
 
 ```ruby
 desc "Build using the enterprise certificate and publish on HockeyApp"
 lane :beta do
   cocoapods(use_bundle_exec: true, try_repo_update_on_error: true)
-  build(project: sampleProject, configuration: betaConfiguration)
+  build(project: sampleProject)
   changelog_from_git_commits(commits_count: 10)
   hockey(
     api_token: ENV["HOCKEYAPP_API_TOKEN"].strip_quotes,
@@ -84,6 +84,9 @@ betaConfiguration.bundleIdentifierOverride = "com.mirego.Sample.beta"
 ## Custom Actions
 The project also includes some custom actions described here.
 
+### enterprise_configuration
+Create a configuration containing a generic provisioning profile and the enterprise certificate. This action take care of extracting informations in environment variables and must be run on Jenkins in order to work.
+
 ### install_provisioning_profile
 Internally required by the `build` private lane, the `install_provisioning_profile` action take care of parsing the provisioning profile and install it in the proper location so that Xcode can use it.
 
@@ -108,7 +111,122 @@ WIP - Do not work at the moment
 - Color ANSI Console Output: `xterm`
 
 ### Jenkins DSL Example
-_TODO_
+```groovy
+String clientName = 'client'
+String projectDisplayName = 'Sample'
+String projectName = 'sample'
+String folderName = 'Client Display Name'
+String slackNotificationChannel = '#project-channel'
+
+folder("$folderName") {
+    description('Jobs related to ' + clientName.capitalize())
+}
+
+job("$folderName/$clientName-$projectName-watcher") {
+    description("Repository watcher for master branch of the $projectDisplayName mobile app")
+    scm {
+        git {
+            branch('origin/master')
+            remote {
+                name('origin')
+                url("${GIT_URL}")
+                credentials('github')
+            }
+            extensions {
+                submoduleOptions {
+                  recursive()
+                }
+            }
+        }
+    }
+    triggers {
+        scm('H/5 * * * *')
+    }
+    steps {
+        triggerBuilder {
+            configs {
+                blockableBuildTriggerConfig {
+                    projects("$folderName/$clientName-$projectName-ios-fastlane")
+                    block {
+                        buildStepFailureThreshold("never")
+                        unstableThreshold("never")
+                        failureThreshold("never")
+                    }
+                    configs {
+                        predefinedBuildParameters {
+                            textParamValueOnNewLine(false)
+                            properties('''Branch=${GIT_BRANCH}
+Lane=beta''')
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+job("$folderName/$clientName-$projectName-ios-fastlane") {
+    description("Builds $projectDisplayName Sample iOS app")
+    logRotator {
+        numToKeep(5)
+    }
+    parameters {
+        stringParam {
+            name('Branch')
+            defaultValue('origin/master')
+            description('The git branch to be built')
+            trim(true)
+        }
+        choiceParam('Lane', ['beta', 'app_store'], 'Name of the lane to run in fastlane')
+    }
+    environmentVariables {
+        keepBuildVariables(true)
+        keepSystemVariables(true)
+        propertiesFile('${HOME}/.build_ios_env')
+    }
+    scm {
+        git {
+            branch('${Branch}')
+            remote {
+                name('origin')
+                url("${GIT_URL}")
+                credentials('github')
+            }
+            extensions {
+                submoduleOptions {
+                    recursive(true)
+                }
+                wipeOutWorkspace()
+            }
+        }
+    }
+    steps {
+        shell('''bundle install
+bundle exec fastlane ${Lane}''')
+    }
+    wrappers {
+        colorizeOutput()
+    }
+    publishers {
+        jUnitResultArchiver {
+            testResults('fastlane/test_output/report.junit')
+        }
+        cobertura('cobertura.xml') {
+            failNoReports(false)
+            sourceEncoding('ASCII')
+
+            methodTarget(80, 0, 0)
+            lineTarget(80, 0, 0)
+            conditionalTarget(70, 0, 0)
+        }
+        slackNotifier {
+            notifyBackToNormal(true)
+            notifyFailure(true)
+            room(slackNotificationChannel)
+        }
+    }
+}
+```
 
 ## Contributing
 If you find that something else could be useful or if your use case is not covered and you feel that it could benefit others, please take the time to contribute by opening a pull request or open an issue asking for it very very kindly ;)
