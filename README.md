@@ -90,8 +90,10 @@ Create a configuration containing a generic provisioning profile and the enterpr
 ### install_provisioning_profile
 Internally required by the `build` private lane, the `install_provisioning_profile` action take care of parsing the provisioning profile and install it in the proper location so that Xcode can use it.
 
+## Plugins
+
 ### icon_banner
-WIP - Do not work at the moment
+The plugin icon_banner is included in the boilerplate. Find the documentation here: [documentation](https://github.com/ebelair/icon-banner)
 
 ## Jenkins Configuration
 ### Required options
