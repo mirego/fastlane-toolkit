@@ -93,7 +93,14 @@ Internally required by the `build` private lane, the `install_provisioning_profi
 ## Plugins
 
 ### icon_banner
-The plugin icon_banner is included in the boilerplate. Find the documentation here: [documentation](https://github.com/ebelair/icon-banner)
+Use icon_badge plugin to add badge icon to your application icon.
+
+To install:
+
+```
+bundle exec fastlane add_plugin icon_banner
+```
+[documentation](https://github.com/ebelair/icon-banner)
 
 ## Jenkins Configuration
 ### Required options
