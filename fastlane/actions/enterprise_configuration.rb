@@ -79,8 +79,8 @@ module Fastlane
           )
 
           Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
-          
-          enterpriseConfiguration
+
+          return enterpriseConfiguration
         end
       end
 
