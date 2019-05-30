@@ -81,6 +81,8 @@ module Fastlane
           Actions.lane_context[SharedValues::ENTERPRISE_CONFIGURATION] = enterpriseConfiguration
 
           return enterpriseConfiguration
+        else
+          UI.user_error!("Enterprise configuration is only available when running on Jenkins")
         end
       end
 
