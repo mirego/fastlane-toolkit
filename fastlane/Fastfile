@@ -42,6 +42,7 @@ platform :ios do
     )
     update_project_provisioning(
       xcodeproj: project.projectPath,
+      target_filter: project.target,
       profile: configuration.provisioningProfile.path,
       build_configuration: configuration.buildConfiguration
     )
