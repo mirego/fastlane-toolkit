@@ -45,7 +45,22 @@ platform :ios do
       profile: configuration.provisioningProfile.path,
       build_configuration: configuration.buildConfiguration
     )
-    unlock_keychain(path: keychain_path, password: keychain_password)
+  end
+
+  private_lane :build_app do |options|
+    project = options[:project]
+    configuration = options[:configuration].nil? ? enterprise_configuration() : options[:configuration]
+    provisioningProfiles = options[:provisioningProfiles]
+
+    keychain_name = strip_quotes(ENV["keychain"])
+    keychain_password = strip_quotes(ENV["keychain_password"])
+    keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
+
+    unlock_keychain(
+      path: keychain_path, 
+      password: keychain_password
+    )
+
     build_ios_app(
       workspace: project.workspacePath,
       scheme: project.scheme,
@@ -61,9 +76,8 @@ platform :ios do
       export_xcargs: "-allowProvisioningUpdates",
       export_options: {
         signingStyle: "manual",
-        provisioningProfiles: {
-          bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME]
-        }
+        provisioningProfiles: provisioningProfiles
       })
   end
+
 end

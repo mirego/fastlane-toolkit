@@ -42,6 +42,17 @@ module Model
       @path = path
     end
   end
+
+  class AppExtension
+    attr_reader :provisioningProfile, :targetFilter, :bundleIdentifier, :provisioningProfileName
+    def initialize(provisioningProfile:, targetFilter:, bundleIdentifier:, provisioningProfileName:)
+      @provisioningProfile = provisioningProfile
+      @targetFilter = targetFilter
+      @bundleIdentifier = bundleIdentifier
+      @provisioningProfileName = provisioningProfileName
+    end
+  end
+
 end
 
 def strip_quotes(input)
