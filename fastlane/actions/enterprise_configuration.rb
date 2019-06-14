@@ -44,12 +44,13 @@ module Model
   end
 
   class AppExtension
-    attr_reader :provisioningProfile, :targetFilter, :bundleIdentifier, :provisioningProfileName
-    def initialize(provisioningProfile:, targetFilter:, bundleIdentifier:, provisioningProfileName:)
+    attr_reader :provisioningProfile, :targetFilter, :bundleIdentifier, :provisioningProfileName, :infoPlistPath
+    def initialize(provisioningProfile:, targetFilter:, bundleIdentifier:, provisioningProfileName:, infoPlistPath:)
       @provisioningProfile = provisioningProfile
       @targetFilter = targetFilter
       @bundleIdentifier = bundleIdentifier
       @provisioningProfileName = provisioningProfileName
+      @infoPlistPath = infoPlistPath
     end
   end
 
