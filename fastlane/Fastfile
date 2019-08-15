@@ -69,7 +69,7 @@ platform :ios do
       configuration: configuration.buildConfiguration,
       silent: true,
       include_symbols: true,
-      include_bitcode: include_bitcode
+      include_bitcode: include_bitcode,
       skip_profile_detection: true,
       codesigning_identity: configuration.certificate.name,
       export_team_id: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID],
