@@ -6,6 +6,31 @@
 #     https://docs.fastlane.tools/actions
 #
 
+platform :android do
+
+  #-------------------------
+  # Private lanes
+  #-------------------------
+
+  desc "Build an Android app given a project and configuration"
+  private_lane :build do |options|
+    project = options[:project]
+    configuration = options[:configuration].nil? ? enterprise_configuration() : options[:configuration]
+  end
+
+  private_lane :build_android_project do |options|
+    project = options[:project]
+    configuration = options[:configuration].nil? ? enterprise_configuration() : options[:configuration]
+
+    build_android_app(
+      task: configuration.task,
+      flavor: configuration.flavor,
+      build_type: configuration.build_type,
+      project_dir: project
+  end
+
+end
+
 platform :ios do
 
   #-------------------------
@@ -58,7 +83,7 @@ platform :ios do
     keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
 
     unlock_keychain(
-      path: keychain_path, 
+      path: keychain_path,
       password: keychain_password
     )
 
