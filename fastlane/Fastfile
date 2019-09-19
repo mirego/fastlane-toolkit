@@ -17,6 +17,7 @@ platform :ios do
     project = options[:project]
     configuration = options[:configuration].nil? ? enterprise_configuration() : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
+    include_bitcode = options[:include_bitcode].nil? ? true : options[:include_bitcode]
 
     keychain_name = strip_quotes(ENV["keychain"])
     keychain_password = strip_quotes(ENV["keychain_password"])
@@ -54,7 +55,7 @@ platform :ios do
       configuration: configuration.buildConfiguration,
       silent: true,
       include_symbols: true,
-      include_bitcode: true,
+      include_bitcode: include_bitcode,
       skip_profile_detection: true,
       codesigning_identity: configuration.certificate.name,
       export_team_id: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID],
