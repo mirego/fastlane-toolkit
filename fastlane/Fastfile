@@ -18,6 +18,7 @@ platform :ios do
     configuration = options[:configuration].nil? ? enterprise_configuration() : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
     include_bitcode = options[:include_bitcode].nil? ? true : options[:include_bitcode]
+    xcargs = options[:xcargs].nil? ? "" : options[:xcargs]
 
     keychain_name = strip_quotes(ENV["keychain"])
     keychain_password = strip_quotes(ENV["keychain_password"])
@@ -25,6 +26,18 @@ platform :ios do
 
     disable_automatic_code_signing(path: project.projectPath)
     install_provisioning_profile(path: configuration.provisioningProfile.path)
+
+    team_id = Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID]
+    provisioningProfiles = { bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME] }
+
+    project.extensions.each { |extension|
+      if configuration.extensionProvisioningProfiles.has_value?(extension.bundleIdentifier)
+        extensionProvisioningProfile = configuration.extensionProvisioningProfiles[extension.bundleIdentifier]
+        install_provisioning_profile(path: extensionProvisioningProfile.path)
+        provisioningProfiles[extension.bundleIdentifier] = Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME]
+      end
+    }
+
     update_project_team(
       path: project.projectPath,
       teamid: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID]
@@ -58,14 +71,13 @@ platform :ios do
       include_bitcode: include_bitcode,
       skip_profile_detection: true,
       codesigning_identity: configuration.certificate.name,
-      export_team_id: Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID],
+      xcargs: xcargs,
+      export_team_id: team_id,
       export_method: configuration.exportMethod,
       export_xcargs: "-allowProvisioningUpdates",
       export_options: {
         signingStyle: "manual",
-        provisioningProfiles: {
-          bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME]
-        }
+        provisioningProfiles: provisioningProfiles
       })
   end
 end

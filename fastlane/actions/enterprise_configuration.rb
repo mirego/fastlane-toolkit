@@ -4,26 +4,28 @@
 
 module Model
   class Project
-    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier
-    def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:)
+    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier, :extensions
+    def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:, extensions: Array.new)
       @workspacePath = workspacePath
       @projectPath = projectPath
       @infoPlistPath = infoPlistPath
       @scheme = scheme
       @target = target
       @bundleIdentifier = bundleIdentifier
+      @extensions = extensions
     end
   end
 
   class Configuration
-    attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride
-    attr_writer :buildConfiguration, :bundleIdentifierOverride
-    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil)
+    attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride, :extensionProvisioningProfiles
+    attr_writer :buildConfiguration, :bundleIdentifierOverride, :extensionProvisioningProfiles
+    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil, extensionProvisioningProfiles: Hash.new)
       @certificate = certificate
       @provisioningProfile = provisioningProfile
       @buildConfiguration = buildConfiguration
       @exportMethod = exportMethod
       @bundleIdentifierOverride = bundleIdentifierOverride
+      @extensionProvisioningProfiles = extensionProvisioningProfiles
     end
   end
 
@@ -40,6 +42,14 @@ module Model
     attr_reader :path
     def initialize(path:)
       @path = path
+    end
+  end
+
+  class AppExtension
+    attr_reader :targetName :bundleIdentifier
+    def initialize(targetName:, bundleIdentifier:)
+      @targetName = targetName
+      @bundleIdentifier = bundleIdentifier
     end
   end
 end
