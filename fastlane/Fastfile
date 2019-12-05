@@ -35,6 +35,13 @@ platform :ios do
         extensionProvisioningProfile = configuration.extensionProvisioningProfiles[extension.bundleIdentifier]
         install_provisioning_profile(path: extensionProvisioningProfile.path)
         provisioningProfiles[extension.bundleIdentifier] = Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME]
+
+        update_project_provisioning(
+          xcodeproj: project.projectPath,
+          target_filter: extension.target,
+          profile: extensionProvisioningProfile.path,
+          build_configuration: configuration.buildConfiguration
+        )
       end
     }
 
