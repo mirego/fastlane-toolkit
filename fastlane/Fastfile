@@ -28,8 +28,8 @@ platform :ios do
     install_provisioning_profile(path: configuration.provisioningProfile.path)
 
     team_id = Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID]
-    provisioningProfiles = { bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME] }
 
+    provisioningProfiles = { bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME] }
     project.extensions.each { |extension|
       if configuration.extensionProvisioningProfiles.has_value?(extension.bundleIdentifier)
         extensionProvisioningProfile = configuration.extensionProvisioningProfiles[extension.bundleIdentifier]
@@ -37,6 +37,8 @@ platform :ios do
         provisioningProfiles[extension.bundleIdentifier] = Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME]
       end
     }
+
+    xcode_select(ENV["XCODE_PATH"])
 
     update_project_team(
       path: project.projectPath,
