@@ -30,6 +30,8 @@ platform :ios do
     team_id = Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID]
     provisioningProfiles = { bundleIdentifier => Actions.lane_context[SharedValues::PROVISIONING_PROFILE_NAME] }
 
+    UI.important "The project has #{extension.count} extensions"
+
     project.extensions.each { |extension|
       if configuration.extensionProvisioningProfiles.has_value?(extension.bundleIdentifier)
         extensionProvisioningProfile = configuration.extensionProvisioningProfiles[extension.bundleIdentifier]
