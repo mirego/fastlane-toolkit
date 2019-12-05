@@ -5,6 +5,7 @@
 module Model
   class Project
     attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier, :extensions
+    attr_writer :extensions
     def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:, extensions: Array.new)
       @workspacePath = workspacePath
       @projectPath = projectPath
@@ -46,7 +47,7 @@ module Model
   end
 
   class AppExtension
-    attr_reader :targetName :bundleIdentifier
+    attr_reader :targetName, :bundleIdentifier
     def initialize(targetName:, bundleIdentifier:)
       @targetName = targetName
       @bundleIdentifier = bundleIdentifier
