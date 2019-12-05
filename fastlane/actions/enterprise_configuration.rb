@@ -48,7 +48,7 @@ module Model
 
   class AppExtension
     attr_reader :target, :bundleIdentifier, :infoPlistPath
-    def initialize(target:, bundleIdentifier:, :infoPlistPath)
+    def initialize(target:, bundleIdentifier:, infoPlistPath:)
       @target = target
       @bundleIdentifier = bundleIdentifier
       @infoPlistPath = infoPlistPath
