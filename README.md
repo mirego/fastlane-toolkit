@@ -4,6 +4,7 @@ This project provides a base Fastfile to minimize the amount of configuration re
 ## What's included?
 The base Fastfile provides basic model classes to make it easier to work with. These classes includes:
 - Project
+  - AppExtension
 - Configuration
   - Certificate
   - ProvisioningProfile
