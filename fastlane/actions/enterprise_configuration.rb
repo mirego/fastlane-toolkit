@@ -4,8 +4,8 @@
 
 module Model
   class Project
-    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier, :extensions
-    attr_writer :bundleIdentifier, :extensions
+    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target
+    attr_accessor :bundleIdentifier, :extensions
     def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:, extensions: Array.new)
       @workspacePath = workspacePath
       @projectPath = projectPath
@@ -18,9 +18,9 @@ module Model
   end
 
   class Configuration
-    attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride, :extensionProvisioningProfiles
-    attr_writer :buildConfiguration, :bundleIdentifierOverride, :provisioningProfile, :extensionProvisioningProfiles
-    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil, extensionProvisioningProfiles: Hash.new)
+    attr_reader :certificate, :exportMethod
+    attr_accessor :buildConfiguration, :bundleIdentifierOverride, :provisioningProfile, :extensionProvisioningProfiles
+    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil, extensionProvisioningProfiles: {})
       @certificate = certificate
       @provisioningProfile = provisioningProfile
       @buildConfiguration = buildConfiguration
