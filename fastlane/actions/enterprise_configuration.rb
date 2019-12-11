@@ -4,26 +4,29 @@
 
 module Model
   class Project
-    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target, :bundleIdentifier
-    def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:)
+    attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target
+    attr_accessor :bundleIdentifier, :extensions
+    def initialize(workspacePath:, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:, extensions: Array.new)
       @workspacePath = workspacePath
       @projectPath = projectPath
       @infoPlistPath = infoPlistPath
       @scheme = scheme
       @target = target
       @bundleIdentifier = bundleIdentifier
+      @extensions = extensions
     end
   end
 
   class Configuration
-    attr_reader :certificate, :provisioningProfile, :buildConfiguration, :exportMethod, :bundleIdentifierOverride
-    attr_writer :buildConfiguration, :bundleIdentifierOverride
-    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil)
+    attr_reader :certificate, :exportMethod
+    attr_accessor :buildConfiguration, :bundleIdentifierOverride, :provisioningProfile, :extensionProvisioningProfiles
+    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil, extensionProvisioningProfiles: {})
       @certificate = certificate
       @provisioningProfile = provisioningProfile
       @buildConfiguration = buildConfiguration
       @exportMethod = exportMethod
       @bundleIdentifierOverride = bundleIdentifierOverride
+      @extensionProvisioningProfiles = extensionProvisioningProfiles
     end
   end
 
@@ -40,6 +43,15 @@ module Model
     attr_reader :path
     def initialize(path:)
       @path = path
+    end
+  end
+
+  class AppExtension
+    attr_reader :target, :bundleIdentifier, :infoPlistPath
+    def initialize(target:, bundleIdentifier:, infoPlistPath:)
+      @target = target
+      @bundleIdentifier = bundleIdentifier
+      @infoPlistPath = infoPlistPath
     end
   end
 end

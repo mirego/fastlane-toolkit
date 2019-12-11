@@ -4,6 +4,7 @@ This project provides a base Fastfile to minimize the amount of configuration re
 ## What's included?
 The base Fastfile provides basic model classes to make it easier to work with. These classes includes:
 - Project
+  - AppExtension
 - Configuration
   - Certificate
   - ProvisioningProfile
@@ -79,6 +80,47 @@ If you need to change the bundle identifier of your app before building it, simp
 
 ```ruby
 betaConfiguration.bundleIdentifierOverride = "com.mirego.Sample.beta"
+```
+
+You can also simply re-assign the bundle identifier of your `Project` instance.
+```ruby
+sampleProject.bundleIdentifier = "com.mirego.Sample.beta"
+```
+
+### App extensions
+If your app contains app extensions, you must provide them via your `Project` instance.
+
+```ruby
+notificationExtension = Model::AppExtension.new(
+  target: "SampleNotifications",
+  bundleIdentifier: "com.mirego.Sample.notifications",
+  infoPlistPath: "SampleNotifications/Info.plist"
+)
+sampleProject.extensions = [notificationExtension]
+```
+
+You also need to provide the provisioning profile to use for each of the registered app extensions in your configuration. The property takes a `Hash` (key value pair) of the extension bundle identifier to a `ProvisioningProfile` instance.
+
+```ruby
+notificationExtensionProvisioningProfile = Model::ProvisioningProfile.new(
+  path: "./fastlane/provisioning/AppStoreNotifications.mobileprovision"
+)
+configuration.extensionProvisioningProfiles = {
+  notificationExtension.bundleIdentifier => notificationExtensionProvisioningProfile
+}
+```
+
+### Bitcode
+Bitcode is enabled by default but if for some reason you need it disabled, you can do so with the `include_bitcode` option.
+```ruby
+build(project: sampleProject, configuration: configuration, include_bitcode: false)
+```
+
+### Xcode environment variables
+If you need to provide Xcode extra environment variables, you can do so using the `xcargs` option of the `build` action. This is the equivalent of the `BUILD_EXTRA_XCODE_ENV` variable when using the `build-ios.sh` script.
+
+```ruby
+build(project: sampleProject, configuration: configuration, xcargs: "ENABLE_CONFIG_PANEL=true")
 ```
 
 ## Custom Actions
