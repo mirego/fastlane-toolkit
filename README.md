@@ -88,7 +88,7 @@ sampleProject.bundleIdentifier = "com.mirego.Sample.beta"
 ```
 
 ### App extensions
-If your app contain app extensions, you must provide them via your `Project` instance.
+If your app contains app extensions, you must provide them via your `Project` instance.
 
 ```ruby
 notificationExtension = Model::AppExtension.new(
