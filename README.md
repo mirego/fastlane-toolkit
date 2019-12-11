@@ -99,7 +99,7 @@ notificationExtension = Model::AppExtension.new(
 sampleProject.extensions = [notificationExtension]
 ```
 
-You also need to provide the provisioning profile to use for each of the registered app extension in your configuration. The property takes a `Hash` (key value pair) of the extension bundle identifier to a `ProvisioningProfile` instance.
+You also need to provide the provisioning profile to use for each of the registered app extensions in your configuration. The property takes a `Hash` (key value pair) of the extension bundle identifier to a `ProvisioningProfile` instance.
 
 ```ruby
 notificationExtensionProvisioningProfile = Model::ProvisioningProfile.new(
