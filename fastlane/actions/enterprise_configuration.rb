@@ -19,13 +19,14 @@ module Model
 
   class Configuration
     attr_reader :certificate, :exportMethod
-    attr_accessor :buildConfiguration, :bundleIdentifierOverride, :provisioningProfile, :extensionProvisioningProfiles
-    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil, extensionProvisioningProfiles: {})
+    attr_accessor :buildConfiguration, :bundleIdentifierOverride, :provisioningProfile, :extensionProvisioningProfiles, :iCloudContainerEnvironment
+    def initialize(certificate:, provisioningProfile:, buildConfiguration:, exportMethod:, bundleIdentifierOverride: nil, iCloudContainerEnvironment: nil, extensionProvisioningProfiles: {})
       @certificate = certificate
       @provisioningProfile = provisioningProfile
       @buildConfiguration = buildConfiguration
       @exportMethod = exportMethod
       @bundleIdentifierOverride = bundleIdentifierOverride
+      @iCloudContainerEnvironment = iCloudContainerEnvironment
       @extensionProvisioningProfiles = extensionProvisioningProfiles
     end
   end
