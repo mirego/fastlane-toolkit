@@ -74,6 +74,14 @@ platform :ios do
       build_configuration: configuration.buildConfiguration
     )
     unlock_keychain(path: keychain_path, password: keychain_password)
+
+    export_options = {
+      signingStyle: "manual",
+      provisioningProfiles: provisioningProfiles
+    }
+
+    export_options[:iCloudContainerEnvironment] = configuration.iCloudContainerEnvironment unless configuration.iCloudContainerEnvironment.nil? 
+
     build_ios_app(
       workspace: project.workspacePath,
       scheme: project.scheme,
@@ -88,9 +96,6 @@ platform :ios do
       export_team_id: team_id,
       export_method: configuration.exportMethod,
       export_xcargs: "-allowProvisioningUpdates",
-      export_options: {
-        signingStyle: "manual",
-        provisioningProfiles: provisioningProfiles
-      })
+      export_options: export_options)
   end
 end
