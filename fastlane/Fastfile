@@ -44,7 +44,7 @@ platform :ios do
 
         update_project_provisioning(
           xcodeproj: project.projectPath,
-          target_filter: extension.target,
+          target_filter: "^#{extension.target}$",
           profile: extensionProvisioningProfile.path,
           build_configuration: configuration.buildConfiguration
         )
@@ -69,7 +69,7 @@ platform :ios do
     )
     update_project_provisioning(
       xcodeproj: project.projectPath,
-      target_filter: project.target,
+      target_filter: "^#{project.target}$",
       profile: configuration.provisioningProfile.path,
       build_configuration: configuration.buildConfiguration
     )
@@ -80,7 +80,7 @@ platform :ios do
       provisioningProfiles: provisioningProfiles
     }
 
-    export_options[:iCloudContainerEnvironment] = configuration.iCloudContainerEnvironment unless configuration.iCloudContainerEnvironment.nil? 
+    export_options[:iCloudContainerEnvironment] = configuration.iCloudContainerEnvironment unless configuration.iCloudContainerEnvironment.nil?
 
     build_ios_app(
       workspace: project.workspacePath,
