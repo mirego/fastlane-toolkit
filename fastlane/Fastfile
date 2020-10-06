@@ -97,7 +97,7 @@ platform :ios do
       export_method: configuration.exportMethod,
       export_xcargs: "-allowProvisioningUpdates",
       export_options: export_options,
-      buildlog_path: "./fastlane"
+      buildlog_path: "./"
       )
   end
 end
