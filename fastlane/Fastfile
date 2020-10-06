@@ -87,7 +87,7 @@ platform :ios do
       scheme: project.scheme,
       clean: true,
       configuration: configuration.buildConfiguration,
-      silent: true,
+      silent: false,
       include_symbols: true,
       include_bitcode: include_bitcode,
       skip_profile_detection: true,
@@ -96,6 +96,8 @@ platform :ios do
       export_team_id: team_id,
       export_method: configuration.exportMethod,
       export_xcargs: "-allowProvisioningUpdates",
-      export_options: export_options)
+      export_options: export_options,
+      buildlog_path: "./fastlane"
+      )
   end
 end
