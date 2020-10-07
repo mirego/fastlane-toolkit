@@ -24,7 +24,7 @@ platform :ios do
     keychain_password = strip_quotes(ENV["keychain_password"])
     keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
 
-    update_code_signing_settings(path: project.projectPath, use_automatic_signing: false)
+    update_code_signing_settings(path: project.projectPath, use_automatic_signing: false, code_sign_identity: "Apple Distribution")
     install_provisioning_profile(path: configuration.provisioningProfile.path)
 
     team_id = Actions.lane_context[SharedValues::PROVISIONING_TEAM_ID]
