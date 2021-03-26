@@ -93,6 +93,7 @@ platform :ios do
       skip_profile_detection: true,
       codesigning_identity: configuration.certificate.name,
       xcargs: xcargs,
+      buildlog_path: File.expand_path("#{project.workspacePath}/.."),
       export_team_id: team_id,
       export_method: configuration.exportMethod,
       export_xcargs: "-allowProvisioningUpdates",
