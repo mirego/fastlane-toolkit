@@ -19,10 +19,33 @@ platform :ios do
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
     include_bitcode = options[:include_bitcode].nil? ? true : options[:include_bitcode]
     xcargs = options[:xcargs].nil? ? "" : options[:xcargs]
+    is_jenkins_ci = ENV["EXEC_RUNNING_ON_JENKINS"] != nil && strip_quotes(ENV["EXEC_RUNNING_ON_JENKINS"]) == "YES"
 
-    keychain_name = strip_quotes(ENV["keychain"])
-    keychain_password = strip_quotes(ENV["keychain_password"])
-    keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
+    if is_jenkins_ci
+      keychain_name = strip_quotes(ENV["keychain"])
+      keychain_password = strip_quotes(ENV["keychain_password"])
+      keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
+    elsif is_ci
+      keychain_name = "fastlane"
+      keychain_password = [*('a'..'z'),*('A'..'Z'),*('0'..'9')].shuffle[0,16].join
+      create_keychain(
+        name: keychain_name,
+        password: keychain_password,
+        default_keychain: true,
+        unlock: true,
+        timeout: 3600,
+        lock_when_sleeps: false
+      )
+      keychain_path = Actions.lane_context[SharedValues::KEYCHAIN_PATH]
+    else
+      keychain_name = UI.input("Your keychain name (e.g. login)? ")
+      keychain_password = UI.password("Your keychain password? ")
+      if keychain_name == "login"
+        keychain_path = keychain_name
+      else
+        keychain_path = UI.input("Your keychain absolute path? ")
+      end
+    end
 
     update_code_signing_settings(path: project.projectPath, use_automatic_signing: false)
     install_provisioning_profile(path: configuration.provisioningProfile.path)
