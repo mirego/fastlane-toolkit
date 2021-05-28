@@ -1,5 +1,5 @@
-# Fastlane boilerplate
-This project provides a base Fastfile to minimize the amount of configuration required to build a project on Jenkins using manual signing with fastlane.
+# Fastlane toolkit
+This project provides a base Fastfile to minimize the amount of configuration required to build a project on CI using manual signing with fastlane.
 
 ## What's included?
 The base Fastfile provides basic model classes to make it easier to work with. These classes includes:
@@ -14,10 +14,10 @@ A build is produced by providing a `Project` object with a `Configuration` objec
 Important to note that this Fastfile is just a starting point, if you need more flexibility or more advanced features I encourage you to use fastlane as it pleases you.
 
 ## Usage
-Start by importing the boilerplate at the very top of your Fastfile and defining your project by creating a `Project` instance describing what's contained in your repository.
+Start by importing the toolkit at the very top of your Fastfile and defining your project by creating a `Project` instance describing what's contained in your repository.
 
 ```ruby
-import_from_git(url: "git@github.com:mirego/fastlane-boilerplate.git")
+import_from_git(url: "git@github.com:mirego/fastlane-toolkit.git")
 
 # ...
 
@@ -31,7 +31,7 @@ sampleProject = Model::Project.new(
 )
 ```
 
-Once it's done, create a lane that import the boilerplate and that calls the provided `build` lane with your project. You can either explicitly specify the enterprise configuration by calling `build(project: sampleProject, configuration: enterprise_configuration())` or simply omit the configuration parameter as it is the default value when none is supplied.
+Once it's done, create a lane that import the toolkit and that calls the provided `build` lane with your project. You can either explicitly specify the enterprise configuration by calling `build(project: sampleProject, configuration: enterprise_configuration())` or simply omit the configuration parameter as it is the default value when none is supplied.
 
 ```ruby
 desc "Build using the enterprise certificate and publish on HockeyApp"
