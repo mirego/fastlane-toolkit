@@ -47,7 +47,7 @@ platform :ios do
         timeout: false,
         lock_when_sleeps: false
       )
-      keychain_path = "#{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}-db"
+      keychain_path = File.expand_path("#{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}-db")
       UI.message "Keychain name is: #{keychain_name}"
       UI.message "Keychain is at path: #{keychain_path}"
     else
