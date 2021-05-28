@@ -12,8 +12,19 @@ platform :ios do
   # Private lanes
   #-------------------------
 
-  desc "Build an iOS archive given a project and configuration"
+  desc "Build an iOS archive given a project and configuration (deprecated)"
   private_lane :build do |options|
+    UI.deprecated("The 'build' lane is deprecated, please use 'build_ios_app_manual_config' instead")
+    build_ios_app_manual_config(
+      project: options[:project],
+      configuration: options[:configuration],
+      include_bitcode: options[:include_bitcode],
+      xcargs: options[:xcargs]
+    )
+  end
+
+  desc "Build an iOS archive given a project and configuration"
+  private_lane :build_ios_app_manual_config do |options|
     project = options[:project]
     configuration = options[:configuration].nil? ? enterprise_configuration() : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
