@@ -33,10 +33,12 @@ platform :ios do
         password: keychain_password,
         default_keychain: true,
         unlock: true,
-        timeout: 3600,
+        timeout: false,
         lock_when_sleeps: false
       )
       keychain_path = Actions.lane_context[SharedValues::KEYCHAIN_PATH]
+      UI.message "Keychain name is: #{keychain_name}"
+      UI.message "Keychain is at path: #{keychain_path}"
     else
       keychain_name = UI.input("Your keychain name (e.g. login)? ")
       keychain_password = UI.password("Your keychain password? ")
@@ -88,7 +90,8 @@ platform :ios do
       certificate_password: configuration.certificate.password,
       keychain_name: keychain_name,
       keychain_path: keychain_path,
-      keychain_password: keychain_password
+      keychain_password: keychain_password,
+      log_output: true
     )
     update_project_provisioning(
       xcodeproj: project.projectPath,
