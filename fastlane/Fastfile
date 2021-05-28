@@ -37,7 +37,7 @@ platform :ios do
       keychain_password = strip_quotes(ENV["keychain_password"])
       keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
     elsif is_ci
-      keychain_name = "fastlane"
+      keychain_name = "fastlane.keychain"
       keychain_password = [*('a'..'z'),*('A'..'Z'),*('0'..'9')].shuffle[0,16].join
       create_keychain(
         name: keychain_name,
@@ -47,7 +47,7 @@ platform :ios do
         timeout: false,
         lock_when_sleeps: false
       )
-      keychain_path = Actions.lane_context[SharedValues::KEYCHAIN_PATH]
+      keychain_path = "#{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}-db"
       UI.message "Keychain name is: #{keychain_name}"
       UI.message "Keychain is at path: #{keychain_path}"
     else
