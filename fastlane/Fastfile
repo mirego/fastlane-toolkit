@@ -48,13 +48,11 @@ platform :ios do
         lock_when_sleeps: false
       )
       keychain_path = File.expand_path("#{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}-db")
-      UI.message "Keychain name is: #{keychain_name}"
-      UI.message "Keychain is at path: #{keychain_path}"
     else
       keychain_name = UI.input("Your keychain name (e.g. login)? ")
       keychain_password = UI.password("Your keychain password? ")
       if keychain_name == "login"
-        keychain_path = keychain_name
+        keychain_path = FastlaneCore::Helper.keychain_path(keychain_name)
       else
         keychain_path = UI.input("Your keychain absolute path? ")
       end
