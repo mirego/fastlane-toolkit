@@ -73,7 +73,9 @@ module Fastlane
 
     class EnterpriseConfigurationAction < Action
       def self.run(params)
-        if ENV["EXEC_RUNNING_ON_JENKINS"] != nil && strip_quotes(ENV["EXEC_RUNNING_ON_JENKINS"]) == "YES"
+        is_jenkins_ci = ENV["EXEC_RUNNING_ON_JENKINS"] != nil && strip_quotes(ENV["EXEC_RUNNING_ON_JENKINS"]) == "YES"
+
+        if is_jenkins_ci || is_ci
           genericProvisioningProfile = Model::ProvisioningProfile.new(
             path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
           )
@@ -95,7 +97,7 @@ module Fastlane
 
           return enterpriseConfiguration
         else
-          UI.user_error!("Enterprise configuration is only available when running on Jenkins")
+          UI.user_error!("Enterprise configuration is only available when running on CI")
         end
       end
 
