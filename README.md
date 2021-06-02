@@ -31,7 +31,7 @@ sampleProject = Model::Project.new(
 )
 ```
 
-Once it's done, create a lane that import the toolkit and that calls the provided `build` lane with your project. You can either explicitly specify the enterprise configuration by calling `build(project: sampleProject, configuration: enterprise_configuration())` or simply omit the configuration parameter as it is the default value when none is supplied.
+Once it's done, create a lane that import the toolkit and that calls the provided `build_ios_app_with_toolkit` lane with your project. You can either explicitly specify the enterprise configuration by calling `build_ios_app_with_toolkit(project: sampleProject, configuration: enterprise_configuration())` or simply omit the configuration parameter as it is the default value when none is supplied.
 
 ```ruby
 desc "Build using the enterprise certificate and publish on AppCenter"
@@ -53,7 +53,7 @@ end
 ```
 
 ### Custom certificate
-If you need to sign your build using a custom signing certificate, create your custom configuration object and call the `build` lane with it.
+If you need to sign your build using a custom signing certificate, create your custom configuration object and call the `build_ios_app_with_toolkit` lane with it.
 
 ```ruby
 appStoreProvisioningProfile = Model::ProvisioningProfile.new(
@@ -81,7 +81,7 @@ end
 ```
 
 ### Bundle identifier override
-If you need to change the bundle identifier of your app before building it, simply assign the `bundleIdentifierOverride` property of your configuration object prior to calling the `build` lane.
+If you need to change the bundle identifier of your app before building it, simply assign the `bundleIdentifierOverride` property of your configuration object prior to calling the `build_ios_app_with_toolkit` lane.
 
 ```ruby
 betaConfiguration.bundleIdentifierOverride = "com.mirego.Sample.beta"
@@ -122,7 +122,7 @@ build_ios_app_with_toolkit(project: sampleProject, configuration: configuration,
 ```
 
 ### Xcode environment variables
-If you need to provide Xcode extra environment variables, you can do so using the `xcargs` option of the `build` action.
+If you need to provide Xcode extra environment variables, you can do so using the `xcargs` option of the `build_ios_app_with_toolkit` action.
 
 ```ruby
 build_ios_app_with_toolkit(project: sampleProject, configuration: configuration, xcargs: "ENABLE_CONFIG_PANEL=true")
