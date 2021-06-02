@@ -34,15 +34,20 @@ sampleProject = Model::Project.new(
 Once it's done, create a lane that import the toolkit and that calls the provided `build` lane with your project. You can either explicitly specify the enterprise configuration by calling `build(project: sampleProject, configuration: enterprise_configuration())` or simply omit the configuration parameter as it is the default value when none is supplied.
 
 ```ruby
-desc "Build using the enterprise certificate and publish on HockeyApp"
+desc "Build using the enterprise certificate and publish on AppCenter"
 lane :beta do
   cocoapods(use_bundle_exec: true, try_repo_update_on_error: true)
-  build(project: sampleProject)
+  build_ios_app_with_toolkit(project: sampleProject)
   changelog_from_git_commits(commits_count: 10)
-  hockey(
-    api_token: ENV["HOCKEYAPP_API_TOKEN"].strip_quotes,
-    public_identifier: "PUT_YOUR_APP_IDENTIFIER_HERE",
-    notify: "0"
+  appcenter_upload(
+    api_token: strip_quotes(ENV["APP_CENTER_API_TOKEN"]),
+    owner_type: "organization",
+    owner_name: "ORG_NAME",
+    app_name: "APP_NAME",
+    ipa: lane_context[SharedValues::IPA_OUTPUT_PATH],
+    dsym: lane_context[SharedValues::DSYM_OUTPUT_PATH],
+    destination_type: "group"
+    destinations: ENV["APP_CENTER_DISTRIBUTION_GROUPS"],
   )
 end
 ```
@@ -69,7 +74,7 @@ appStoreConfiguration = Model::Configuration.new(
 )
 
 lane :release do
-  build(project: sampleProject, configuration: appStoreConfiguration)
+  build_ios_app_with_toolkit(project: sampleProject, configuration: appStoreConfiguration)
   upload_to_app_store(force: true)
   slack(message: "Successfully submitted #{sampleProject.target} to AppStore", slack_url: "https://hooks.slack.com/services/T025F65SP/AAW2V1FC3/rgMjwWCk21ag79rjdhbfDS78G")
 end
@@ -113,14 +118,14 @@ configuration.extensionProvisioningProfiles = {
 ### Bitcode
 Bitcode is enabled by default but if for some reason you need it disabled, you can do so with the `include_bitcode` option.
 ```ruby
-build(project: sampleProject, configuration: configuration, include_bitcode: false)
+build_ios_app_with_toolkit(project: sampleProject, configuration: configuration, include_bitcode: false)
 ```
 
 ### Xcode environment variables
-If you need to provide Xcode extra environment variables, you can do so using the `xcargs` option of the `build` action. This is the equivalent of the `BUILD_EXTRA_XCODE_ENV` variable when using the `build-ios.sh` script.
+If you need to provide Xcode extra environment variables, you can do so using the `xcargs` option of the `build` action.
 
 ```ruby
-build(project: sampleProject, configuration: configuration, xcargs: "ENABLE_CONFIG_PANEL=true")
+build_ios_app_with_toolkit(project: sampleProject, configuration: configuration, xcargs: "ENABLE_CONFIG_PANEL=true")
 ```
 
 ## Custom Actions
@@ -130,7 +135,7 @@ The project also includes some custom actions described here.
 Create a configuration containing a generic provisioning profile and the enterprise certificate. This action take care of extracting informations in environment variables and must be run on Jenkins in order to work.
 
 ### install_provisioning_profile
-Internally required by the `build` private lane, the `install_provisioning_profile` action take care of parsing the provisioning profile and install it in the proper location so that Xcode can use it.
+Internally required by the `build_ios_app_with_toolkit` private lane, the `install_provisioning_profile` action take care of parsing the provisioning profile and install it in the proper location so that Xcode can use it.
 
 ## Plugins
 
