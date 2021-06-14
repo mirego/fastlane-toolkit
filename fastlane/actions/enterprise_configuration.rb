@@ -75,7 +75,7 @@ module Fastlane
       def self.run(params)
         is_jenkins_ci = ENV["EXEC_RUNNING_ON_JENKINS"] != nil && strip_quotes(ENV["EXEC_RUNNING_ON_JENKINS"]) == "YES"
 
-        if is_jenkins_ci || is_ci
+        if is_jenkins_ci || other_action.is_ci
           genericProvisioningProfile = Model::ProvisioningProfile.new(
             path: "#{strip_quotes(ENV["PROVISIONING_DIR"])}/#{strip_quotes(ENV["PROVISIONING_FILE"])}"
           )
