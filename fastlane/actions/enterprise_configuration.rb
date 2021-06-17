@@ -58,7 +58,9 @@ module Model
 end
 
 def strip_quotes(input)
-  input.gsub(/\A['"]+|['"]+\Z/, "")
+  unless input.nil?
+    input.gsub(/\A['"]+|['"]+\Z/, "")
+  end
 end
 
 #-------------------------
