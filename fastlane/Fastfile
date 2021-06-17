@@ -44,7 +44,7 @@ platform :ios do
         password: keychain_password,
         default_keychain: true,
         unlock: true,
-        timeout: false,
+        timeout: 21600, # 6 hours, bypass regression introduced in 2.185.1 https://github.com/fastlane/fastlane/issues/18892
         lock_when_sleeps: false
       )
       keychain_path = File.expand_path("#{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}-db")
