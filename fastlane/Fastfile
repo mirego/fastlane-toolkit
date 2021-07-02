@@ -31,6 +31,8 @@ platform :ios do
     include_bitcode = options[:include_bitcode].nil? ? true : options[:include_bitcode]
     include_symbols = options[:include_symbols].nil? ? true : options[:include_symbols]
     disable_xcpretty = options[:disable_xcpretty].nil? ? false : options[:disable_xcpretty]
+    clean_before_build = options[:clean_before_build].nil? ? false : options[:clean_before_build]
+    silent = options[:silent].nil? ? true : options[:silent]
     xcargs = options[:xcargs].nil? ? "" : options[:xcargs]
     is_jenkins_ci = ENV["EXEC_RUNNING_ON_JENKINS"] != nil && strip_quotes(ENV["EXEC_RUNNING_ON_JENKINS"]) == "YES"
 
@@ -122,9 +124,9 @@ platform :ios do
     build_ios_app(
       workspace: project.workspacePath,
       scheme: project.scheme,
-      clean: true,
+      clean: clean_before_build,
       configuration: configuration.buildConfiguration,
-      silent: true,
+      silent: silent,
       include_bitcode: include_bitcode,
       include_symbols: include_symbols,
       disable_xcpretty: disable_xcpretty,
