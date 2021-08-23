@@ -98,6 +98,7 @@ platform :ios do
       plist_path: project.infoPlistPath,
       app_identifier: bundleIdentifier
     )
+    unlock_keychain(path: keychain_path, password: keychain_password)
     import_certificate(
       certificate_path: configuration.certificate.path,
       certificate_password: configuration.certificate.password,
@@ -112,7 +113,6 @@ platform :ios do
       profile: configuration.provisioningProfile.path,
       build_configuration: configuration.buildConfiguration
     )
-    unlock_keychain(path: keychain_path, password: keychain_password)
 
     export_options = {
       signingStyle: "manual",
