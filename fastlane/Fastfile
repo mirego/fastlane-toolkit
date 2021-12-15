@@ -12,17 +12,55 @@ platform :ios do
   # Private lanes
   #-------------------------
 
-  desc "Build an iOS archive given a project and configuration"
+  desc "Build an iOS archive given a project and configuration (deprecated)"
   private_lane :build do |options|
+    UI.deprecated("The 'build' lane is deprecated, please use 'build_ios_app_with_toolkit' instead")
+    build_ios_app_with_toolkit(
+      project: options[:project],
+      configuration: options[:configuration],
+      include_bitcode: options[:include_bitcode],
+      xcargs: options[:xcargs]
+    )
+  end
+
+  desc "Build an iOS archive given a project and configuration"
+  private_lane :build_ios_app_with_toolkit do |options|
     project = options[:project]
     configuration = options[:configuration].nil? ? enterprise_configuration() : options[:configuration]
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
     include_bitcode = options[:include_bitcode].nil? ? true : options[:include_bitcode]
+    include_symbols = options[:include_symbols].nil? ? true : options[:include_symbols]
+    disable_xcpretty = options[:disable_xcpretty].nil? ? false : options[:disable_xcpretty]
+    clean_before_build = options[:clean_before_build].nil? ? false : options[:clean_before_build]
+    silent = options[:silent].nil? ? true : options[:silent]
     xcargs = options[:xcargs].nil? ? "" : options[:xcargs]
+    is_jenkins_ci = ENV["EXEC_RUNNING_ON_JENKINS"] != nil && strip_quotes(ENV["EXEC_RUNNING_ON_JENKINS"]) == "YES"
 
-    keychain_name = strip_quotes(ENV["keychain"])
-    keychain_password = strip_quotes(ENV["keychain_password"])
-    keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
+    if is_jenkins_ci
+      keychain_name = strip_quotes(ENV["keychain"])
+      keychain_password = strip_quotes(ENV["keychain_password"])
+      keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
+    elsif is_ci
+      keychain_name = "fastlane.keychain"
+      keychain_password = [*('a'..'z'),*('A'..'Z'),*('0'..'9')].shuffle[0,16].join
+      create_keychain(
+        name: keychain_name,
+        password: keychain_password,
+        default_keychain: true,
+        unlock: true,
+        timeout: 21600, # 6 hours, bypass regression introduced in 2.185.1 https://github.com/fastlane/fastlane/issues/18892
+        lock_when_sleeps: false
+      )
+      keychain_path = File.expand_path("#{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}-db")
+    else
+      keychain_name = UI.input("Your keychain name (e.g. login)? ")
+      keychain_password = UI.password("Your keychain password? ")
+      if keychain_name == "login"
+        keychain_path = FastlaneCore::Helper.keychain_path(keychain_name)
+      else
+        keychain_path = UI.input("Your keychain absolute path? ")
+      end
+    end
 
     update_code_signing_settings(path: project.projectPath, use_automatic_signing: false)
     install_provisioning_profile(path: configuration.provisioningProfile.path)
@@ -60,12 +98,14 @@ platform :ios do
       plist_path: project.infoPlistPath,
       app_identifier: bundleIdentifier
     )
+    unlock_keychain(path: keychain_path, password: keychain_password)
     import_certificate(
       certificate_path: configuration.certificate.path,
       certificate_password: configuration.certificate.password,
       keychain_name: keychain_name,
       keychain_path: keychain_path,
-      keychain_password: keychain_password
+      keychain_password: keychain_password,
+      log_output: true
     )
     update_project_provisioning(
       xcodeproj: project.projectPath,
@@ -73,7 +113,6 @@ platform :ios do
       profile: configuration.provisioningProfile.path,
       build_configuration: configuration.buildConfiguration
     )
-    unlock_keychain(path: keychain_path, password: keychain_password)
 
     export_options = {
       signingStyle: "manual",
@@ -85,11 +124,12 @@ platform :ios do
     build_ios_app(
       workspace: project.workspacePath,
       scheme: project.scheme,
-      clean: true,
+      clean: clean_before_build,
       configuration: configuration.buildConfiguration,
-      silent: true,
-      include_symbols: true,
+      silent: silent,
       include_bitcode: include_bitcode,
+      include_symbols: include_symbols,
+      disable_xcpretty: disable_xcpretty,
       skip_profile_detection: true,
       codesigning_identity: configuration.certificate.name,
       xcargs: xcargs,
