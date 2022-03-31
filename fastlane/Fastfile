@@ -30,7 +30,7 @@ platform :ios do
     bundleIdentifier = configuration.bundleIdentifierOverride != nil ? configuration.bundleIdentifierOverride : project.bundleIdentifier
     include_bitcode = options[:include_bitcode].nil? ? true : options[:include_bitcode]
     include_symbols = options[:include_symbols].nil? ? true : options[:include_symbols]
-    thinningExportOption = options[:thinningExportOption].nil ? "<none>" : options[:thinningExportOption]
+    thinningExportOption = options[:thinningExportOption].nil? ? "<none>" : options[:thinningExportOption]
     disable_xcpretty = options[:disable_xcpretty].nil? ? false : options[:disable_xcpretty]
     clean_before_build = options[:clean_before_build].nil? ? false : options[:clean_before_build]
     silent = options[:silent].nil? ? true : options[:silent]
