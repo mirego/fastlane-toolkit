@@ -136,6 +136,8 @@ platform :ios do
       export_team_id: team_id,
       export_method: configuration.exportMethod,
       export_xcargs: "-allowProvisioningUpdates",
-      export_options: export_options)
+      export_options: export_options,
+      buildlog_path: "./build/logs/"
+    )
   end
 end
