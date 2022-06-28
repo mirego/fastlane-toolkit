@@ -118,7 +118,8 @@ platform :ios do
     export_options = {
       signingStyle: "manual",
       provisioningProfiles: provisioningProfiles,
-      thinning: export_options_thinning
+      thinning: export_options_thinning,
+      distributionBundleIdentifier: bundleIdentifier
     }
 
     export_options[:iCloudContainerEnvironment] = configuration.iCloudContainerEnvironment unless configuration.iCloudContainerEnvironment.nil?
