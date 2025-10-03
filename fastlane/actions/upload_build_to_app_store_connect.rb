@@ -9,8 +9,6 @@ module Fastlane
   module Actions
     class UploadBuildToAppStoreConnectAction < Action
       def self.run(params)
-        Socket.tcp_fast_fallback = false
-
         # Get API token
         api_token = self.api_token(params)
 
