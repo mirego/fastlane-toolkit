@@ -131,6 +131,77 @@ build_ios_app_with_toolkit(project: sampleProject, configuration: configuration,
 ## Custom Actions
 The project also includes some custom actions described here.
 
+### upload_build_to_app_store_connect
+Upload an IPA build to App Store Connect using the modern Build Uploads API ([App Store Connect API 4.1](https://developer.apple.com/documentation/appstoreconnectapi/app-store-connect-api-4-1-release-notes)). This action provides a more reliable and future-proof alternative to `upload_to_testflight`, with better error handling and progress tracking.
+
+#### Features
+- Uses Apple's latest Build Uploads API endpoints
+- Automatically extracts build metadata (bundle ID, version, build number) from IPA
+- Chunked file uploads with automatic retry logic and exponential backoff
+- Optional build processing status tracking
+- Supports all Apple platforms (iOS, macOS, tvOS, watchOS, visionOS)
+
+#### Parameters
+
+| Parameter | Environment Variable | Description | Default | Required |
+|-----------|---------------------|-------------|---------|----------|
+| `ipa` | `UPLOAD_BUILD_IPA` | Path to the IPA file to upload | IPA output path from lane context | Yes |
+| `api_key_path` | `APP_STORE_CONNECT_API_KEY_PATH` | Path to your App Store Connect API Key JSON file | - | No* |
+| `api_key` | `APP_STORE_CONNECT_API_KEY` | App Store Connect API Key information (Hash) | - | No* |
+| `app_identifier` | `UPLOAD_BUILD_APP_IDENTIFIER` | The bundle identifier of your app | Value from Appfile | No** |
+| `apple_id` | `UPLOAD_BUILD_APPLE_ID` | The Apple ID of your app | - | No** |
+| `platform` | `UPLOAD_BUILD_PLATFORM` | Platform of the build | `IOS` | No |
+| `skip_waiting_for_build_processing` | `UPLOAD_BUILD_SKIP_WAITING_FOR_PROCESSING` | Skip waiting for build processing to complete | `false` | No |
+| `processing_timeout` | `UPLOAD_BUILD_PROCESSING_TIMEOUT` | Timeout for build processing in seconds | `3600` (1 hour) | No |
+| `max_upload_retries` | `UPLOAD_BUILD_MAX_UPLOAD_RETRIES` | Maximum number of retries for uploading chunks | `10` | No |
+
+\* Either `api_key_path`, `api_key`, or a prior call to `app_store_connect_api_key` is required  
+\*\* Either `app_identifier` or `apple_id` is required
+
+#### Platform Values
+Valid values for the `platform` parameter:
+- `IOS` (default)
+- `MAC_OS`
+- `TV_OS`
+- `WATCH_OS`
+- `VISION_OS`
+
+#### Return Value
+Returns a Hash containing:
+- `build_upload_id`: The ID of the build upload
+- `upload_file_id`: The ID of the uploaded file
+- `app_id`: The App Store Connect app ID
+- `version`: The app version from the IPA
+- `build_number`: The build number from the IPA
+
+#### Examples
+
+**With custom timeout and retry settings:**
+```ruby
+upload_build_to_app_store_connect(
+  ipa: "./MyApp.ipa",
+  api_key_path: "./AuthKey.json",
+  app_identifier: "com.example.myapp",
+  processing_timeout: 7200, # 2 hours
+  max_upload_retries: 10
+)
+```
+
+**Using with `app_store_connect_api_key` action:**
+```ruby
+app_store_connect_api_key(
+  key_id: "D383AB000",
+  issuer_id: "6053b7fe-68a8-6acb-00be-165aa0000000",
+  key_filepath: "./AuthKey_D383SF000.p8"
+)
+
+# build_ios_app ...
+
+upload_build_to_app_store_connect(
+  app_identifier: "com.example.myapp"
+)
+```
+
 ### enterprise_configuration
 Create a configuration containing a generic provisioning profile and the enterprise certificate. This action take care of extracting informations in environment variables and must be run on Jenkins in order to work.
 
