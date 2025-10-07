@@ -27,7 +27,9 @@ module Fastlane
 
         # Extract build metadata from IPA
         UI.message("Extracting build metadata from IPA...")
-        build_metadata = self.extract_build_metadata(ipa_path)
+        # Get bundle ID from app attributes
+        bundle_id = app.dig('attributes', 'bundleId')
+        build_metadata = self.extract_build_metadata(ipa_path, bundle_id)
         UI.message("Bundle ID: #{build_metadata[:bundle_id]}")
         UI.message("Version: #{build_metadata[:version]}")
         UI.message("Build: #{build_metadata[:build_number]}")
@@ -86,21 +88,31 @@ module Fastlane
         }
       end
 
-      def self.extract_build_metadata(ipa_path)
+      def self.extract_build_metadata(ipa_path, expected_bundle_id)
         require 'cfpropertylist'
         
-        # Extract Info.plist from IPA
         info_plist_data = nil
         
         Zip::File.open(ipa_path) do |zip_file|
-          # Find the .app directory and Info.plist
-          app_entry = zip_file.glob('Payload/*.app/Info.plist').first
+          app_entries = zip_file.glob('Payload/*.app/Info.plist')
           
-          unless app_entry
-            UI.user_error!("Could not find Info.plist in IPA file")
+          if app_entries.empty?
+            UI.user_error!("Could not find any Info.plist in IPA file")
           end
           
-          info_plist_data = app_entry.get_input_stream.read
+          # Find the Info.plist that matches the expected bundle ID
+          matching_entry = app_entries.find do |entry|
+            data = entry.get_input_stream.read
+            plist = CFPropertyList::List.new(data: data)
+            info = CFPropertyList.native_types(plist.value)
+            info['CFBundleIdentifier'] == expected_bundle_id
+          end
+
+          if matching_entry
+            info_plist_data = matching_entry.get_input_stream.read
+          else
+            UI.user_error!("Could not find Info.plist with bundle ID: #{expected_bundle_id}")
+          end
         end
         
         # Parse the plist
