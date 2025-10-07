@@ -163,6 +163,8 @@ module Fastlane
           url = URI("https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=#{params[:app_identifier]}")
           response = self.make_api_request(url, api_token, :get)
           
+          UI.message("Received following response from Apple for app identifier: #{response}")
+
           apps = response.dig('data')
           if apps.nil? || apps.empty?
             UI.user_error!("Could not find app with bundle ID: #{params[:app_identifier]}")
