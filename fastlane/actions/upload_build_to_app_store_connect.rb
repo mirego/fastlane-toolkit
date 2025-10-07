@@ -27,7 +27,7 @@ module Fastlane
 
         # Extract build metadata from IPA
         UI.message("Extracting build metadata from IPA...")
-        build_metadata = self.extract_build_metadata(ipa_path)
+        build_metadata = self.extract_build_metadata(ipa_path, params[:app_identifier])
         UI.message("Bundle ID: #{build_metadata[:bundle_id]}")
         UI.message("Version: #{build_metadata[:version]}")
         UI.message("Build: #{build_metadata[:build_number]}")
@@ -86,35 +86,71 @@ module Fastlane
         }
       end
 
-      def self.extract_build_metadata(ipa_path)
+      def self.extract_build_metadata(ipa_path, expected_bundle_id = nil)
         require 'cfpropertylist'
-        
+
         # Extract Info.plist from IPA
         info_plist_data = nil
-        
+        found_bundle_id = nil
+
         Zip::File.open(ipa_path) do |zip_file|
-          # Find the .app directory and Info.plist
-          app_entry = zip_file.glob('Payload/*.app/Info.plist').first
-          
-          unless app_entry
-            UI.user_error!("Could not find Info.plist in IPA file")
+          # Find all Info.plist files
+          info_plists = zip_file.glob('Payload/*.app/Info.plist')
+
+          if info_plists.empty?
+            UI.user_error!("Could not find any Info.plist in IPA file")
           end
-          
-          info_plist_data = app_entry.get_input_stream.read
+
+          # If we have an expected bundle ID, try to find the matching one
+          if expected_bundle_id
+            UI.message("Looking for Info.plist with bundle ID: #{expected_bundle_id}")
+
+            info_plists.each do |entry|
+              plist_data = entry.get_input_stream.read
+              plist = CFPropertyList::List.new(data: plist_data)
+              info = CFPropertyList.native_types(plist.value)
+
+              if info['CFBundleIdentifier'] == expected_bundle_id
+                UI.success("Found matching Info.plist for bundle ID: #{expected_bundle_id}")
+                info_plist_data = plist_data
+                found_bundle_id = expected_bundle_id
+                break
+              end
+            end
+
+            # If we couldn't find a matching bundle ID, show all found bundle IDs
+            unless info_plist_data
+              found_bundles = info_plists.map do |entry|
+                plist_data = entry.get_input_stream.read
+                plist = CFPropertyList::List.new(data: plist_data)
+                info = CFPropertyList.native_types(plist.value)
+                info['CFBundleIdentifier']
+              end.compact
+
+              UI.important("Could not find Info.plist with bundle ID: #{expected_bundle_id}")
+              UI.important("Found the following bundle IDs in the IPA: #{found_bundles.join(', ')}")
+              UI.user_error!("Bundle ID mismatch - expected '#{expected_bundle_id}' but IPA contains: #{found_bundles.join(', ')}")
+            end
+          else
+            # No expected bundle ID specified, use the first one (backward compatibility)
+            UI.message("No expected bundle ID specified, using first Info.plist found")
+            app_entry = info_plists.first
+            info_plist_data = app_entry.get_input_stream.read
+          end
         end
-        
+
         # Parse the plist
         plist = CFPropertyList::List.new(data: info_plist_data)
         info = CFPropertyList.native_types(plist.value)
-        
+
         bundle_id = info['CFBundleIdentifier']
         version = info['CFBundleShortVersionString']
         build_number = info['CFBundleVersion']
-        
+
         unless bundle_id && version && build_number
           UI.user_error!("Could not extract required metadata from Info.plist")
         end
-        
+
         {
           bundle_id: bundle_id,
           version: version,
