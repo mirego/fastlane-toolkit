@@ -206,7 +206,11 @@ module Fastlane
             UI.user_error!("Could not find app with bundle ID: #{params[:app_identifier]}")
           end
           
-          apps.first
+          exact_match = apps.find do |app|
+            app.dig('attributes', 'bundleId') == params[:app_identifier]
+          end
+
+          exact_match || apps.first
         elsif params[:apple_id]
           # Get by Apple ID
           url = URI("https://api.appstoreconnect.apple.com/v1/apps/#{params[:apple_id]}")
