@@ -198,15 +198,24 @@ module Fastlane
           # Search by bundle identifier
           url = URI("https://api.appstoreconnect.apple.com/v1/apps?filter[bundleId]=#{params[:app_identifier]}")
           response = self.make_api_request(url, api_token, :get)
-          
+
           UI.message("Received following response from Apple for app identifier: #{response}")
 
           apps = response.dig('data')
           if apps.nil? || apps.empty?
             UI.user_error!("Could not find app with bundle ID: #{params[:app_identifier]}")
           end
-          
-          apps.first
+
+          exact_match = apps.find do |app|
+            app.dig('attributes', 'bundleId') == params[:app_identifier]
+          end
+
+          if exact_match.nil?
+            found_bundles = apps.map { |app| app.dig('attributes', 'bundleId') }.compact
+            UI.user_error!("Could not find exact match for bundle ID: #{params[:app_identifier]}. Found: #{found_bundles.join(', ')}")
+          end
+
+          exact_match
         elsif params[:apple_id]
           # Get by Apple ID
           url = URI("https://api.appstoreconnect.apple.com/v1/apps/#{params[:apple_id]}")
