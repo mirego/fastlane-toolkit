@@ -34,6 +34,7 @@ platform :ios do
     clean_before_build = options[:clean_before_build].nil? ? false : options[:clean_before_build]
     silent = options[:silent].nil? ? true : options[:silent]
     xcargs = options[:xcargs].nil? ? "" : options[:xcargs]
+    skip_package_signature_validation = options[:skip_package_signature_validation].nil? ? false : options[:skip_package_signature_validation]
     is_jenkins_ci = ENV["EXEC_RUNNING_ON_JENKINS"] != nil && strip_quotes(ENV["EXEC_RUNNING_ON_JENKINS"]) == "YES"
 
     if is_jenkins_ci
@@ -120,6 +121,10 @@ platform :ios do
     }
 
     export_options[:iCloudContainerEnvironment] = configuration.iCloudContainerEnvironment unless configuration.iCloudContainerEnvironment.nil?
+
+    if skip_package_signature_validation
+      xcargs = xcargs.empty? ? "-skipPackageSignatureValidation" : "#{xcargs} -skipPackageSignatureValidation"
+    end
 
     build_ios_app(
       workspace: project.workspacePath,

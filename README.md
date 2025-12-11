@@ -128,6 +128,15 @@ If you need to provide Xcode extra environment variables, you can do so using th
 build_ios_app_with_toolkit(project: sampleProject, configuration: configuration, xcargs: "ENABLE_CONFIG_PANEL=true")
 ```
 
+### Skip package signature validation
+Xcode 26 introduced stricter code signing requirements for SPM package resource bundles. When archiving for release, SPM packages with resources may fail with signing errors. To work around this, use the `skip_package_signature_validation` option to pass the `-skipPackageSignatureValidation` flag to xcodebuild.
+
+```ruby
+build_ios_app_with_toolkit(project: sampleProject, configuration: configuration, skip_package_signature_validation: true)
+```
+
+This option defaults to `false` and only appends the flag when explicitly set to `true`.
+
 ## Custom Actions
 The project also includes some custom actions described here.
 
