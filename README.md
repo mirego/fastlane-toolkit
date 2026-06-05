@@ -31,6 +31,20 @@ sampleProject = Model::Project.new(
 )
 ```
 
+If your project does not use a workspace (e.g. no CocoaPods or SPM workspace), you can omit `workspacePath` and provide only `projectPath`:
+
+```ruby
+sampleProject = Model::Project.new(
+  projectPath: "Sample.xcodeproj",
+  infoPlistPath: "Sample/Info.plist",
+  scheme: "Sample",
+  target: "Sample",
+  bundleIdentifier: "com.mirego.Sample"
+)
+```
+
+When `workspacePath` is not provided, the build will use the `.xcodeproj` file directly via `build_ios_app`'s `project:` parameter instead of `workspace:`.
+
 Once it's done, create a lane that import the toolkit and that calls the provided `build_ios_app_with_toolkit` lane with your project. You can either explicitly specify the enterprise configuration by calling `build_ios_app_with_toolkit(project: sampleProject, configuration: enterprise_configuration())` or simply omit the configuration parameter as it is the default value when none is supplied.
 
 ```ruby
