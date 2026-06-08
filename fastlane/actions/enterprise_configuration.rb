@@ -6,7 +6,7 @@ module Model
   class Project
     attr_reader :workspacePath, :projectPath, :infoPlistPath, :scheme, :target
     attr_accessor :bundleIdentifier, :extensions
-    def initialize(workspacePath:, projectPath: nil, infoPlistPath:, scheme:, target:, bundleIdentifier:, extensions: Array.new)
+    def initialize(workspacePath: nil, projectPath:, infoPlistPath:, scheme:, target:, bundleIdentifier:, extensions: Array.new)
       @workspacePath = workspacePath
       @projectPath = projectPath
       @infoPlistPath = infoPlistPath
