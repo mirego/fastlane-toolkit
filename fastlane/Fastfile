@@ -121,8 +121,11 @@ platform :ios do
 
     export_options[:iCloudContainerEnvironment] = configuration.iCloudContainerEnvironment unless configuration.iCloudContainerEnvironment.nil?
 
+    use_workspace = !project.workspacePath.nil? && !project.workspacePath.empty?
+    
     build_ios_app(
-      workspace: project.workspacePath,
+      workspace: use_workspace ? project.workspacePath : nil,
+      project: use_workspace ? nil : project.projectPath,
       scheme: project.scheme,
       clean: clean_before_build,
       configuration: configuration.buildConfiguration,
