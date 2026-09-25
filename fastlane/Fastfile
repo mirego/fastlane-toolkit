@@ -42,15 +42,28 @@ platform :ios do
       keychain_path = "#{ENV["HOME"]}/Library/Keychains/#{keychain_name}.keychain-db"
     elsif is_ci
       keychain_name = "fastlane.keychain"
-      keychain_password = [*('a'..'z'),*('A'..'Z'),*('0'..'9')].shuffle[0,16].join
-      create_keychain(
-        name: keychain_name,
-        password: keychain_password,
-        default_keychain: true,
-        unlock: true,
-        timeout: 21600, # 6 hours, bypass regression introduced in 2.185.1 https://github.com/fastlane/fastlane/issues/18892
-        lock_when_sleeps: false
-      )
+
+      # Reuse the password from a previous call in this same fastlane run:
+      # create_keychain skips creation when the keychain already exists (e.g. when this
+      # lane builds several targets in a row) but still unlocks it with the password given
+      # here, so generating a new random one on each call locks us out of the existing keychain.
+      if Actions.lane_context[:CI_KEYCHAIN_PASSWORD].nil?
+        keychain_password = [*('a'..'z'),*('A'..'Z'),*('0'..'9')].shuffle[0,16].join
+        create_keychain(
+          name: keychain_name,
+          password: keychain_password,
+          default_keychain: true,
+          unlock: true,
+          timeout: 21600, # 6 hours, bypass regression introduced in 2.185.1 https://github.com/fastlane/fastlane/issues/18892
+          lock_when_sleeps: false
+        )
+        Actions.lane_context[:CI_KEYCHAIN_PASSWORD] = keychain_password
+      else
+        # Already created, set as default and unlocked (with a 6-hour timeout) by the
+        # first call above, so there's nothing left to do here.
+        keychain_password = Actions.lane_context[:CI_KEYCHAIN_PASSWORD]
+      end
+
       keychain_path = File.expand_path("#{Actions.lane_context[SharedValues::KEYCHAIN_PATH]}-db")
     else
       keychain_name = UI.input("Your keychain name (e.g. login)? ")
